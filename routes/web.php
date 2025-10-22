@@ -32,13 +32,16 @@ use App\Http\Controllers\Maitre\{
     DashboardController as ControllersMaitreDashboardController,
     EmploisDuTempsController as MaitreEmploisDuTempsController,
     MaitreDashboardController,
+    PaiementMaitreController as MaitrePaiementMaitreController,
+    ProfileController as MaitreProfileController,
     LoginController as MaitreLoginController
 };
 
 // Controllers Tuteur
 use App\Http\Controllers\Tuteur\{
     TuteurDashboardController,
-    LoginController as TuteurLoginController
+    LoginController as TuteurLoginController,
+    DashboardController as ControllersTuteurDashboardController,
 };
 
 // Controllers Auth
@@ -348,6 +351,14 @@ Route::prefix('maitre')->group(function () {
 
         Route::get('/paiement_maitres', [MaitreController::class, 'index'])->name('maitre.paiement');
         Route::post('/logout', [MaitreLoginController::class, 'logout'])->name('maitre.logout');
+
+        Route::get('paiement_maitres', [MaitrePaiementMaitreController::class, 'index'])->name('maitre.paiement.index');
+        Route::get('paiement_maitres/{id}', [MaitrePaiementMaitreController::class, 'show'])->name('maitre.paiement.show');
+
+
+        Route::get('profil', [MaitreProfileController::class, 'index'])->name('maitre.profile.index');
+        Route::get('profil/edit', [MaitreProfileController::class, 'edit'])->name('maitre.profile.edit');
+        Route::post('profil/update', [MaitreProfileController::class, 'update'])->name('maitre.profile.update');
     });
 });
 
@@ -361,11 +372,11 @@ Route::prefix('tuteur')->group(function () {
     Route::middleware(['tuteur.guest'])->group(function () {
         Route::get('/login', [TuteurLoginController::class, 'index'])->name('tuteur.login');
         Route::post('/login', [TuteurLoginController::class, 'login'])->name('tuteur.login.submit');
+        Route::get('/dashboard', [ControllersTuteurDashboardController::class, 'index'])->name('tuteur.dashboard');
     });
 
     // Connectés
     Route::middleware(['auth:tuteur'])->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Tuteur\DashboardController::class, 'index'])->name('tuteur.dashboard');
         Route::post('/logout', [TuteurLoginController::class, 'logout'])->name('tuteur.logout');
     });
 });

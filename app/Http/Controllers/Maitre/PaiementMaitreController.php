@@ -8,7 +8,7 @@ use App\Models\PaiementMaitre;
 
 class PaiementMaitreController extends Controller
 {
-    // Liste des paiements du maître connecté
+    // ✅ Affiche tous les paiements du maître connecté
     public function index()
     {
         $maitreId = Auth::guard('maitre')->id();
@@ -18,6 +18,18 @@ class PaiementMaitreController extends Controller
             ->orderBy('date_paiement', 'desc')
             ->get();
 
-        return view('maitre.paiements.index', compact('paiements'));
+        return view('maitre.paiement_maitres.index', compact('paiements'));
+    }
+
+    // ✅ Affiche un paiement spécifique appartenant au maître connecté
+    public function show($id)
+    {
+        $maitreId = Auth::guard('maitre')->id();
+
+        $paiement = PaiementMaitre::with(['anneeScolaire'])
+            ->where('maitre_id', $maitreId)
+            ->findOrFail($id);
+
+        return view('maitre.paiement_maitres.show', compact('paiement'));
     }
 }

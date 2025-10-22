@@ -4,7 +4,9 @@
                         <span class="app-brand-logo demo">
                                 <!-- SVG Logo ici -->
                         </span>
-                        <span class="app-brand-text demo menu-text fw-bolder ms-2">ECOLE</span>
+                        <span class="app-brand-text demo menu-text fw-bolder ms-2" style="color: red; text-transform: uppercase;">
+                                CENTRE BOUTA
+                        </span>
                 </a>
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
                         <i class="bx bx-chevron-left bx-sm align-middle"></i>
@@ -30,7 +32,7 @@
 
 
                 <li class="menu-item {{ request()->routeIs('paiement-maitre.*') ? 'active' : '' }}">
-                        <a href="{{ route('maitre.paiement') }}" class="menu-link">
+                        <a href="{{ route('maitre.paiement.index') }}" class="menu-link">
                                 <div data-i18n="Basic">Paiements des maitres</div>
                         </a>
                 </li>

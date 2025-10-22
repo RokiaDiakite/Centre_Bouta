@@ -13,8 +13,7 @@
         <thead class="table-primary">
             <tr>
                 <th>Jour</th>
-                <th>Heure Début</th>
-                <th>Heure Fin</th>
+                <th>Heure </th>
                 <th>Classe</th>
                 <th>Matière</th>
                 <th>Année Scolaire</th>
@@ -24,8 +23,7 @@
             @foreach($emplois as $emploi)
             <tr>
                 <td>{{ ucfirst($emploi->jour) }}</td>
-                <td>{{ \Carbon\Carbon::parse($emploi->heure_debut)->format('H:i') }}</td>
-                <td>{{ \Carbon\Carbon::parse($emploi->heure_fin)->format('H:i') }}</td>
+                <td>{{ \Carbon\Carbon::parse($emploi->heure_debut)->format('H:i') }} / {{ \Carbon\Carbon::parse($emploi->heure_fin)->format('H:i') }}</td>
                 <td>{{ $emploi->classe->nom }}</td>
                 <td>{{ $emploi->matiere->nom }}</td>
                 <td>{{ $emploi->anneeScolaire->annee ?? 'N/A' }}</td>

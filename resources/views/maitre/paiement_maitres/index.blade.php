@@ -9,14 +9,15 @@
         Aucun paiement enregistré pour le moment.
     </div>
     @else
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+    <table class="table table-bordered table-striped align-middle">
+        <thead  class="table-primary">
             <tr>
                 <th>Mois</th>
                 <th>Montant</th>
                 <th>Date Paiement</th>
                 <th>Mode de Paiement</th>
                 <th>Année Scolaire</th>
+                <th class="text-center">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -27,6 +28,11 @@
                 <td>{{ \Carbon\Carbon::parse($paiement->date_paiement)->format('d/m/Y') }}</td>
                 <td>{{ $paiement->mode_paiement ?? '-' }}</td>
                 <td>{{ $paiement->anneeScolaire->annee ?? '-' }}</td>
+                <td class="text-center">
+                    <a href="{{ route('maitre.paiement.show', $paiement->id) }}" class="btn btn-sm btn-primary">
+                        Voir détails
+                    </a>
+                </td>
             </tr>
             @endforeach
         </tbody>

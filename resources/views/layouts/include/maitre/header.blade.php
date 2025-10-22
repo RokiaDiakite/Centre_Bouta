@@ -66,8 +66,8 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="">
-                            <i class="bx bx-user me-2"></i>
+                        <a class="dropdown-item" href="{{route('maitre.profile.index')}}">
+                            <i class="bx bx-user me-2"></i> <!-- icône profil -->
                             <span class="align-middle">Profil</span>
                         </a>
                     </li>
