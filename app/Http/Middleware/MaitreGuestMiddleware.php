@@ -1,7 +1,7 @@
 <?php
- 
+
 namespace App\Http\Middleware;
- 
+
 use Closure;
 
 use Illuminate\Http\Request;
@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use Symfony\Component\HttpFoundation\Response;
- 
+
 class MaitreGuestMiddleware
 
 {
@@ -32,14 +32,14 @@ class MaitreGuestMiddleware
 
     {
 
-        if (Auth::check()) {
+        if (Auth::guard('maitre')->check()) {
 
             // Utilisateur déjà authentifié : on redirige vers le tableau de bord
 
             return redirect('maitre/dashboard');
 
         }
- 
+
         // Sinon, on continue la requête
 
         return $next($request);
@@ -48,4 +48,3 @@ class MaitreGuestMiddleware
 
 }
 
- 

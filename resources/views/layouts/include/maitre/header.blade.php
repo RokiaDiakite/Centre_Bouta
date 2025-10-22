@@ -66,7 +66,7 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{route('profile.index')}}">
+                        <a class="dropdown-item" href="">
                             <i class="bx bx-user me-2"></i>
                             <span class="align-middle">Profil</span>
                         </a>
@@ -75,13 +75,13 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{ route('logout') }}"
+                        <a class="dropdown-item" href="{{ route('maitre.logout') }}"
                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                             <i class="bx bx-power-off me-2"></i>
                             <span class="align-middle">Deconnexion</span>
                         </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        <form id="logout-form" action="{{ route('maitre.logout') }}" method="POST" class="d-none">
                             @csrf
                         </form>
                     </li>

@@ -30,7 +30,7 @@ class LoginController extends Controller
         ]);
 
         // Tentative de connexion
-        if (Auth::guard('maitre')->attempt($credentials, $request->filled('remember'))) {
+        if (auth()->guard('maitre')->attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended(route('maitre.dashboard')); // Redirection vers le dashboard du maître
         }
@@ -47,7 +47,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::guard('maitre')->logout();             // Déconnecte le maître
+       auth()->guard('maitre')->logout();             // Déconnecte le maître
         $request->session()->invalidate();           // Invalide la session
         $request->session()->regenerateToken();      // Regénère le token CSRF
 
