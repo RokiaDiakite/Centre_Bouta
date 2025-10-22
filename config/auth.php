@@ -36,10 +36,22 @@ return [
     */
 
     'guards' => [
+
+
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'users'
         ],
+        'maitre' => [
+            'driver' => 'session',
+            'provider' => 'maitres'
+        ],
+        'tuteur' => [
+            'driver' => 'session',
+            'provider' => 'tuteurs',
+        ],
+
+
     ],
 
     /*
@@ -62,9 +74,17 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\User::class
+        ],
+        'maitres' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Maitre::class
         ],
 
+        'tuteurs' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Tuteur::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
