@@ -15,8 +15,8 @@ class Authenticate extends Middleware
         if ($request->expectsJson()) {
             return null;
         } else {
-            toastr()->info('Vous avez été déconnecté');
-            return route('login');
+            toastr()->info('Veuillez vous reconnecter');
+            return route('welcome');
         }
     }
 }

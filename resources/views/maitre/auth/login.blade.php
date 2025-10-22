@@ -87,7 +87,7 @@
                         <h4 class="mb-2">Bienvenue</h4>
                         <p class="mb-4">Connectez-vous pour acceder à votre tableau de board</p>
 
-                        <form id="formAuthentication" class="mb-3" method="POST" action="{{ route('maitre.login') }}">
+                        <form id="formAuthentication" class="mb-3" method="POST" action="{{ route('maitre.login.submit') }}">
                             @csrf
                             <div class="mb-3">
                                 <label for="email" class="form-label ">Email</label>

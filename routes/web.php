@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\{
 
 // Controllers Maitre
 use App\Http\Controllers\Maitre\{
+    DashboardController as ControllersMaitreDashboardController,
     EmploisDuTempsController as MaitreEmploisDuTempsController,
     MaitreDashboardController,
     LoginController as MaitreLoginController
@@ -58,7 +59,7 @@ Route::get('/', function () {
 | Routes Admin
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->middleware(['auth:web'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Utilisateurs
@@ -340,7 +341,7 @@ Route::prefix('maitre')->group(function () {
 
     // Connectés
     Route::middleware(['auth:maitre'])->group(function () {
-        Route::get('/dashboard', [MaitreController::class, 'index'])->name('maitre.dashboard');
+        Route::get('/dashboard', [ControllersMaitreDashboardController::class, 'index'])->name('maitre.dashboard');
         Route::get('emploi-du-temps', [MaitreEmploisDuTempsController::class, 'index'])->name('maitre.emploi.index');
         Route::get('emploi-du-temps/{id}', [MaitreEmploisDuTempsController::class, 'show'])->name('maitre.emploi.show');
         Route::get('emploi-du-temps/print', [MaitreEmploisDuTempsController::class, 'print'])->name('maitre.emploi.print');
@@ -364,7 +365,7 @@ Route::prefix('tuteur')->group(function () {
 
     // Connectés
     Route::middleware(['auth:tuteur'])->group(function () {
-        Route::get('/dashboard', [TuteurController::class, 'index'])->name('tuteur.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Tuteur\DashboardController::class, 'index'])->name('tuteur.dashboard');
         Route::post('/logout', [TuteurLoginController::class, 'logout'])->name('tuteur.logout');
     });
 });
