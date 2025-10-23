@@ -12,8 +12,9 @@ class Tuteur extends Authenticatable
 
     public function eleves()
     {
-        return $this->hasMany(Eleve::class);
+        return $this->hasMany(Eleve::class, 'tuteur_id');
     }
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -26,5 +27,9 @@ class Tuteur extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

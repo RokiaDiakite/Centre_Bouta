@@ -32,4 +32,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Maitre::class, 'user_id');
     }
+    public function tuteurs()
+    {
+        return $this->hasMany(Tuteur::class);
+    }
 }

@@ -52,6 +52,7 @@ return [
         ],
 
 
+
     ],
 
     /*
@@ -85,10 +86,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Tuteur::class,
         ],
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+
     ],
 
     /*

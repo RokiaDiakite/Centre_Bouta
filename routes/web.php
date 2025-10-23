@@ -42,6 +42,10 @@ use App\Http\Controllers\Tuteur\{
     TuteurDashboardController,
     LoginController as TuteurLoginController,
     DashboardController as ControllersTuteurDashboardController,
+    EmploisDuTempsController as ControllersTuteurEmploisDuTempsController,
+    FraisScolaireController as ControllersTuteurFraisScolaireController,
+    ProfileController as ControllersTuteurProfileController,
+    BulletinController  as ControllersTuteurBulletinController
 };
 
 // Controllers Auth
@@ -372,12 +376,31 @@ Route::prefix('tuteur')->group(function () {
     Route::middleware(['tuteur.guest'])->group(function () {
         Route::get('/login', [TuteurLoginController::class, 'index'])->name('tuteur.login');
         Route::post('/login', [TuteurLoginController::class, 'login'])->name('tuteur.login.submit');
-        Route::get('/dashboard', [ControllersTuteurDashboardController::class, 'index'])->name('tuteur.dashboard');
     });
 
     // Connectés
     Route::middleware(['auth:tuteur'])->group(function () {
         Route::post('/logout', [TuteurLoginController::class, 'logout'])->name('tuteur.logout');
+        Route::get('/dashboard', [ControllersTuteurDashboardController::class, 'index'])->name('tuteur.dashboard');
+
+        Route::get('/bulletins', [ControllersTuteurBulletinController::class, 'index'])->name('tuteur.bulletin.index');
+        Route::get('/bulletins/{eleve}', [ControllersTuteurBulletinController::class, 'show'])->name('tuteur.bulletin.show');
+        Route::get('/bulletins/{eleve}/telecharger', [ControllersTuteurBulletinController::class, 'download'])->name('tuteur.bulletin.download');
+
+
+        Route::get('/emplois', [ControllersTuteurEmploisDuTempsController::class, 'index'])->name('tuteur.emplois.index');
+        Route::get('/emplois/{eleve}', [ControllersTuteurEmploisDuTempsController::class, 'show'])->name('tuteur.emplois.show');
+        Route::get('/emplois/download/{eleve}', [ControllersTuteurEmploisDuTempsController::class, 'download'])->name('tuteur.emplois.download');
+
+
+
+
+        Route::get('/eleves/frais', [ControllersTuteurFraisScolaireController::class, 'index'])->name('tuteur.frais_scolaire.index');
+        Route::get('/eleve/{eleve}/frais', [ControllersTuteurFraisScolaireController::class, 'show'])->name('tuteur.frais_scolaire.show');
+
+        Route::get('profil', [ControllersTuteurProfileController::class, 'index'])->name('tuteur.profile.index');
+        Route::get('profil/edit', [ControllersTuteurProfileController::class, 'edit'])->name('tuteur.profile.edit');
+        Route::post('profil/update', [ControllersTuteurProfileController::class, 'update'])->name('tuteur.profile.update');
     });
 });
 
