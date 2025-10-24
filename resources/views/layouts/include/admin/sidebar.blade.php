@@ -97,6 +97,11 @@
                                                 <div data-i18n="Connections">Bulletins</div>
                                         </a>
                                 </li>
+                                <li class="menu-item {{ request()->routeIs('passation.*') ? 'active' : '' }}">
+                                        <a href="{{ route('passation') }}" class="menu-link">
+                                                <div data-i18n="Connections">Passation</div>
+                                        </a>
+                                </li>
 
                         </ul>
                 </li>

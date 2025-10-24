@@ -185,14 +185,20 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::get('eleves', 'index')->name('eleve.index');
 
         Route::get('eleves/create', 'create')->name('eleve.create');
+
         Route::get('eleves/show/{id}', 'show')->name('eleve.show');
 
         Route::post('eleves/store', 'store')->name('eleve.store');
 
         Route::get('eleves/{id}/edit', 'edit')->name('eleve.edit');
+
         Route::post('eleves/update/{id}', 'update')->name('eleve.update');
 
         Route::post('eleves/delete/{id}', 'delete')->name('eleve.delete');
+        Route::get('eleves/passation','passation')->name('passation');
+        Route::get('passation/eleves', 'getEleves');
+        Route::post('passation/faire-passer/{id}', 'fairePasser');
+
     });
 
     //  Évaluations

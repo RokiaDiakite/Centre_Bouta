@@ -8,6 +8,7 @@ use App\Models\Tuteur;
 use Illuminate\Http\Request;
 use App\Models\AnneeScolaire;
 use App\Http\Controllers\Controller;
+use App\Models\Inscription;
 
 class EleveController extends Controller
 {
@@ -152,5 +153,76 @@ class EleveController extends Controller
     public function show($id){
          $eleve = Eleve::with(['tuteur', 'classe'])->findOrFail($id);
         return view('admin.eleves.show', compact('eleve'));
+    }
+
+    public function passation(){
+        $annees = AnneeScolaire::all();
+        $classes = Classe::all();
+         return view('admin.eleves.passation', compact('annees', 'classes'));
+    }
+
+    public function getEleves(Request $request)
+{
+   $eleves = Eleve::whereHas('inscriptions', function ($q) use ($request) {
+                        $q->where('annee_id', $request->annee)
+                          ->where('classe_id', $request->classe);
+                    })
+                    ->with(['classe'])
+                    ->get()
+                    ->map(function ($e) {
+                        return [
+                            'id' => $e->id,
+                            'nom' => $e->nom,
+                            'prenom' => $e->prenom,
+                            'matricule' => $e->matricule,
+                            'classe_nom' => $e->classe->nom ?? '-',
+                        ];
+                    });
+
+        return response()->json($eleves);
+                }
+public function fairePasser($id)
+    {
+        $eleve = Eleve::findOrFail($id);
+        $inscription = $eleve->inscriptions()->latest('annee_id')->first();
+
+        if (!$inscription) {
+            return response()->json(['message' => 'Aucune inscription trouvée pour cet élève.'], 404);
+        }
+
+        // Trouver l'année suivante
+        $anneeSuivante = AnneeScolaire::where('id', '>', $inscription->annee_id)->orderBy('id')->first();
+
+        if (!$anneeSuivante) {
+            return response()->json(['message' => 'Aucune année scolaire suivante trouvée.'], 404);
+        }
+
+        // Trouver la classe suivante
+        $classeSuivante = Classe::where('niveau', '>', $inscription->classe->niveau)
+                                ->orderBy('niveau')
+                                ->first();
+
+        if (!$classeSuivante) {
+            return response()->json(['message' => 'Aucune classe supérieure trouvée.'], 404);
+        }
+
+        // Vérifier si l'élève n'est pas déjà inscrit dans la nouvelle année
+        $existe = Inscription::where('eleve_id', $eleve->id)
+                             ->where('annee_id', $anneeSuivante->id)
+                             ->exists();
+
+        if ($existe) {
+            return response()->json(['message' => 'Cet élève est déjà inscrit pour l’année suivante.']);
+        }
+
+        // Créer la nouvelle inscription
+        Inscription::create([
+            'eleve_id' => $eleve->id,
+            'classe_id' => $classeSuivante->id,
+            'annee_id' => $anneeSuivante->id,
+            'statut' => 'inscrit',
+        ]);
+
+        return response()->json(['message' => 'Élève reconduit avec succès dans la nouvelle année !']);
     }
 }
