@@ -3,12 +3,12 @@
 <div class="container">
     <h3>Gestion des Emplois du Temps</h3>
 
-    <a href="{{ route('emploi.create') }}" class="btn btn-success mb-3">➕ Ajouter un créneau</a>
+    <a href="{{ route('emploi.create') }}" class="btn btn-primary mb-3">➕ Ajouter un créneau</a>
     <a href="{{ route('emploi.select.classe') }}" class="btn btn-primary mb-3">📅 Voir par Classe</a>
-    <a href="{{ route('emploi.select.maitre') }}" class="btn btn-warning mb-3">👨‍🏫 Voir par Maitre</a>
+    <a href="{{ route('emploi.select.maitre') }}" class="btn btn-primary mb-3">👨‍🏫 Voir par Maitre</a>
 
     <table class="table table-bordered">
-        <thead class="table-dark">
+        <thead class="table-primary">
             <tr>
                 <th>Jour</th>
                 <th>Classe</th>

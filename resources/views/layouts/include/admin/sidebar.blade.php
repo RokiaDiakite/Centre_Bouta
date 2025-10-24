@@ -92,7 +92,7 @@
                                                 <div data-i18n="Notifications">Notes</div>
                                         </a>
                                 </li>
-                                <li class="menu-item {{ request()->routeIs('admin.bulletin.*') ? 'active' : '' }}">
+                                <li class="menu-item {{ request()->routeIs('bulletin.*') ? 'active' : '' }}">
                                         <a href="{{ route('bulletin.select') }}" class="menu-link">
                                                 <div data-i18n="Connections">Bulletins</div>
                                         </a>

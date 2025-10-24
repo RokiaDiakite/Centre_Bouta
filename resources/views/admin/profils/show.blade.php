@@ -41,7 +41,12 @@
                     <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
                 </div>
             </div>
-
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="photo" class="form-label">Photo</label>
+                    <input type="file" class="form-control" id="photo" name="photo" value="{{ old('photo', $user->photo) }}" >
+                </div>
+            </div>
             <hr>
 
             <div class="row">

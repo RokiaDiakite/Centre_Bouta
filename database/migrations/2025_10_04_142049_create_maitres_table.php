@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('numero')->nullable();
             $table->string('adresse')->nullable();
             $table->decimal('salaire', 10, 2)->default(0);
+            $table->boolean('statut')->default(1);
+            $table->text('photo')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

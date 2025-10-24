@@ -5,7 +5,7 @@
 <div class="container mt-4">
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">➕ Ajouter une note pour un élève</h4>
+            <h4 class="mb-0 text-white">➕ Ajouter une note pour un élève</h4>
             <a href="{{ route('note.index') }}" class="btn btn-warning btn-sm fw-bold px-3">⬅️ Retour</a>
         </div>
 

@@ -113,4 +113,9 @@ class TuteurController extends Controller
 
         return redirect()->route('tuteur.index')->with('success', 'Tuteur supprimé avec succès.');
     }
+
+     public function show($id){
+         $tuteur = Tuteur::findOrFail($id);
+        return view('admin.tuteurs.show', compact('tuteur'));
+    }
 }

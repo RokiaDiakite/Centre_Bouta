@@ -33,7 +33,7 @@
     <!-- 📊 Tableau statistiques par classe -->
     <div class="card mt-4">
         <div class="card-header text-white text-center bg-primary">
-            <h5>Statistiques par Classe — Année scolaire {{ $annee->libelle }}</h5>
+            <h3 class="text-white">Statistiques par Classe — Année scolaire {{ $annee->libelle }}</h3>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-striped text-center align-middle">

@@ -178,53 +178,44 @@ class BulletinController extends Controller
     }
     public function printAll(Request $request)
     {
-        $classe = Classe::findOrFail($request->classe);
-        $annee = AnneeScolaire::findOrFail($request->annee);
-        $evaluation = Evaluation::findOrFail($request->evaluation);
+        $anneeId = $request->input('annee');
+        $evaluationId = $request->input('evaluation');
+        $classeId = $request->input('classe');
 
-        // Tous les élèves de la classe
-        $eleves = Eleve::whereHas('notes', function ($q) use ($classe, $annee, $evaluation) {
-            $q->where('classe_id', $classe->id)
-                ->where('annee_scolaire_id', $annee->id)
-                ->where('evaluation_id', $evaluation->id);
-        })->get();
+        $annee = AnneeScolaire::find($anneeId);
+        $evaluation = Evaluation::find($evaluationId);
+        $classe = Classe::findOrFail($classeId);
 
-        // Toutes les matières de la classe
-        $matieres = $classe->matieres()->orderByDesc('coefficient')->get();
+        $eleves = $classe->eleves; // ✅ relation directe
+        $matieres = $classe->matieres; // ✅ relation via pivot
 
-        // Notes de tous les élèves
         $notes = [];
         foreach ($eleves as $eleve) {
-            $notes[$eleve->id] = Note::where('eleve_id', $eleve->id)
-                ->where('classe_id', $classe->id)
-                ->where('annee_scolaire_id', $annee->id)
-                ->where('evaluation_id', $evaluation->id)
+            $notesEleve = Note::where('eleve_id', $eleve->id)
+                ->where('evaluation_id', $evaluationId)
                 ->get()
                 ->keyBy('matiere_id');
+            $notes[$eleve->id] = $notesEleve;
         }
 
-        // Proverbes
         $proverbes = [
-            "L’éducation est l’arme la plus puissante pour changer le monde. – Nelson Mandela",
-            "La réussite appartient à ceux qui persévèrent.",
-            "Ne rêve pas ta vie, vis tes rêves.",
-            "Chaque jour est une chance de s’améliorer.",
-            "Petit à petit, l’oiseau fait son nid.",
-            "Il n’y a pas de raccourci vers n’importe où qui en vaille la peine.",
-            "Apprends comme si tu devais vivre pour toujours.",
-            // … tu peux en mettre autant que tu veux
+            "Le savoir est une arme puissante.",
+            "Rien n’est impossible à un cœur vaillant.",
+            "L’éducation est la clé de l’avenir.",
+            "Celui qui apprend grandit chaque jour."
         ];
 
         return view('admin.bulletins.print-all', compact(
-            'classe',
             'annee',
             'evaluation',
+            'classe',
             'eleves',
             'matieres',
             'notes',
             'proverbes'
         ));
     }
+
     public function printAllForm()
     {
         $classes = Classe::all();
@@ -232,5 +223,21 @@ class BulletinController extends Controller
         $evaluations = Evaluation::all();
 
         return view('admin.bulletins.print-all-form', compact('classes', 'annees', 'evaluations'));
+    }
+    public function getElevesParClasse(Request $request)
+    {
+        $classeId = $request->input('classe');
+        $anneeId = $request->input('annee');
+
+        if (!$classeId || !$anneeId) {
+            return response()->json([]);
+        }
+
+        // Si les élèves ont une colonne `classe_id`, on récupère simplement ceux de la classe
+        $eleves = \App\Models\Eleve::where('classe_id', $classeId)
+            ->orderBy('nom')
+            ->get(['id', 'nom', 'prenom']);
+
+        return response()->json($eleves);
     }
 }

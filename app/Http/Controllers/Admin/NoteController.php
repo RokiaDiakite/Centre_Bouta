@@ -44,35 +44,29 @@ class NoteController extends Controller
     }
 
     // Enregistrement d'une note individuelle
-    public function store(Request $request)
+    public function update(Request $request, Note $note)
     {
         $request->validate([
             'annee_id' => 'required|exists:annee_scolaires,id',
             'classe_id' => 'required|exists:classes,id',
-            'eleve_id' => 'required|exists:eleves,id',
             'matiere_id' => 'required|exists:matieres,id',
             'evaluation_id' => 'required|exists:evaluations,id',
             'note_devoir' => 'nullable|numeric|min:0|max:20',
             'note_evaluation' => 'nullable|numeric|min:0|max:20',
         ]);
 
-        Note::updateOrCreate(
-            [
-                'annee_scolaire_id' => $request->annee_id,
-                'classe_id' => $request->classe_id,
-                'eleve_id' => $request->eleve_id,
-                'matiere_id' => $request->matiere_id,
-            ],
-            [
-                'evaluation_id' => $request->evaluation_id,
-                'note_devoir' => $request->note_devoir !== null ? floatval(str_replace(',', '.', $request->note_devoir)) : null,
-                'note_evaluation' => $request->note_evaluation !== null ? floatval(str_replace(',', '.', $request->note_evaluation)) : null,
-                // On ne stocke pas le coefficient ici, on le récupère toujours depuis la table matiere
-            ]
-        );
+        $note->update([
+            'annee_scolaire_id' => $request->annee_id,
+            'classe_id' => $request->classe_id,
+            'matiere_id' => $request->matiere_id,
+            'evaluation_id' => $request->evaluation_id,
+            'note_devoir' => $request->note_devoir,
+            'note_evaluation' => $request->note_evaluation,
+        ]);
 
-        return redirect()->route('note.index')->with('success', 'Note enregistrée avec succès.');
+        return redirect()->route('note.index')->with('success', 'Note mise à jour avec succès.');
     }
+
 
     // Formulaire et enregistrement des notes par classe
     public function createClasse()
@@ -145,10 +139,26 @@ class NoteController extends Controller
     {
         $eleves = Eleve::whereHas('inscriptions', function ($query) use ($classe_id) {
             $query->where('classe_id', $classe_id);
-        })->with(['notes' => function ($q) {
-            $q->with('matiere'); // utile si tu veux préremplir
-        }])->get(['id', 'nom', 'prenom']);
+        })
+            ->select('id', 'nom', 'prenom')
+            ->orderBy('nom')
+            ->get();
 
         return response()->json($eleves);
+    }
+    public function destroy(Note $note)
+    {
+        $note->delete();
+
+        return redirect()->route('note.index')->with('success', 'Note supprimée avec succès.');
+    }
+    public function edit(Note $note)
+    {
+        $annees = \App\Models\AnneeScolaire::all();
+        $classes = \App\Models\Classe::all();
+        $matieres = \App\Models\Matiere::all();
+        $evaluations = \App\Models\Evaluation::all();
+
+        return view('admin.notes.edit', compact('note', 'annees', 'classes', 'matieres', 'evaluations'));
     }
 }

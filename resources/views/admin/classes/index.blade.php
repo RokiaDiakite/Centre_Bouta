@@ -8,9 +8,12 @@
         @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        <div class="display-flex justify-content-between">
+        <div class="d-flex justify-content-between ">
             <h5 class="card-header">Liste des classes</h5>
-            <a class="btn btn-primary" href="{{route('classe.create')}}">Ajouter</a>
+            <div class="m-4">
+                <a class="btn btn-primary " href="{{route('classe.create')}}">Ajouter</a>
+            </div>
+
         </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
@@ -41,7 +44,7 @@
 
                                         @csrf
 
-                                        
+
                                         <button type="submit" onclick="return confirm('Voulez-vous vraiment supprimer ?')" class="btn btn-danger btn-sm"><i class="bx bx-trash me-1"></i>Supprimer</button>
                                     </form>
 

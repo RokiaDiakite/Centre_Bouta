@@ -35,9 +35,10 @@
                                 <input type="text" class="form-control" id="basic-default-name" value="{{$classe->nom}}" name="nom" placeholder="" />
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Niveau</label>
-                            <select name="niveau" class="form-control" required>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Niveau</label>
+                            <div class="col-sm-10">
+                            <select name="niveau" class="form-select" required>
                                 <option value="">-- Sélectionnez --</option>
                                 <option value="Maternelle" {{ $classe->niveau == 'Maternelle' ? 'selected' : '' }}>Maternelle</option>
                                 <option value="Premier cycle" {{ $classe->niveau == 'Premier cycle' ? 'selected' : '' }}>Premier cycle</option>

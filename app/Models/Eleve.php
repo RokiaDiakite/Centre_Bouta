@@ -42,4 +42,8 @@ class Eleve extends Model
     {
         return $this->hasOne(Inscription::class)->latestOfMany();
     }
+    public function notes()
+    {
+        return $this->hasMany(\App\Models\Note::class);
+    }
 }

@@ -14,7 +14,9 @@
 
         <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-header">Liste des inscriptions</h5>
-            <a class="btn btn-primary" href="{{ route('inscription.create') }}">Ajouter</a>
+            <div >
+            <a class="btn btn-primary m-4" href="{{ route('inscription.create') }}">Ajouter</a>
+            </div>
         </div>
 
         <div class="d-flex justify-content-end align-items-center mb-3 gap-3 p-3">
@@ -72,7 +74,7 @@
                         <td>
                             <div class="dropdown">
                                 <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Actions
+                                    <i class="bx bx-dots-vertical-rounded fs-4"></i>    
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{{ route('inscription.edit',$ins->id) }}">Modifier</a></li>

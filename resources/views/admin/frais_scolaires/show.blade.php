@@ -48,11 +48,12 @@
             </div>
 
             {{-- Bouton --}}
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Afficher</button>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary ">Afficher</button>
+                 <a href="{{ route('frais.index') }}" class="btn btn-secondary ">Annuler</a>
             </div>
             <div class="mt-3 d-flex justify-content-end">
-                <a href="{{ route('frais.index') }}" class="btn btn-secondary me-2">Annuler</a>
+               
             </div>
         </form>
 

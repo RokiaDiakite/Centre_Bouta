@@ -33,7 +33,7 @@
         </li>
 
         <!-- Frais scolaire -->
-        <li class="menu-item {{ request()->routeIs('frais.*') ? 'active open' : '' }}">
+        <li class="menu-item {{ request()->routeIs('tuteur.frais_scolaire.*') ? 'active open' : '' }}">
             <a href="{{ route('tuteur.frais_scolaire.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-money"></i>
                 <div>Frais scolaire</div>

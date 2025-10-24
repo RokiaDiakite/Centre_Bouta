@@ -34,28 +34,31 @@
                 <input type="text" class="form-control" id="basic-default-name" name="nom" placeholder="" />
               </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label>Niveau</label>
-              <select name="niveau" class="form-control" required>
-                <option value="">-- Sélectionnez --</option>
-                <option value="Maternelle">Maternelle</option>
-                <option value="Premier cycle">Premier cycle</option>
-                <option value="Second cycle">Second cycle</option>
-              </select>
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label">Niveau</label>
+              <div class="col-sm-10">
+                <select name="niveau" class="form-select" required>
+                  <option value="">-- Sélectionnez --</option>
+                  <option value="Maternelle">Maternelle</option>
+                  <option value="Premier cycle">Premier cycle</option>
+                  <option value="Second cycle">Second cycle</option>
+                </select>
+              </div>
             </div>
-
-        </div>
-        <div class="row mb-3">
-          <label class="col-sm-2 col-form-label" for="basic-default-name">Frais Scolaire</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="basic-default-name" name="frais" placeholder="" />
-          </div>
-        </div>
-        <div class="row justify-content-end">
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label" for="basic-default-name">Frais Scolaire</label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" id="basic-default-name" name="frais" placeholder="" />
+              </div>
+            </div>
+            <div class="row justify-content-end">
           <div class="col-sm-10">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
           </div>
         </div>
+        </div>
+
+        
         </form>
       </div>
     </div>

@@ -13,7 +13,9 @@ return new class extends Migration
             $table->string('nom');
             $table->string('prenom');
             $table->string('username');
+            $table->boolean('statut')->default(1);
             $table->string('email')->unique();
+            $table->text('photo')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

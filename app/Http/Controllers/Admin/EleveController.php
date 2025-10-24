@@ -19,32 +19,44 @@ class EleveController extends Controller
         $classes = Classe::all();
         $annees = AnneeScolaire::all();
 
-        // 🔹 Charger les élèves avec tuteur, classe et dernière inscription
-        $query = Eleve::with([
-            'tuteur',
-            'classe',
-            'inscriptions' => function ($q) {
-                $q->orderByDesc('created_at')->limit(1);
-            },
-            'inscriptions.anneeScolaire',
-        ]);
+        $query = Eleve::query();
 
-        // 🔹 Filtrer par classe si demandé
+        // Si aucun filtre ni recherche => ne rien afficher
+        if (!$request->filled('search') && !$request->filled('classe_id') && !$request->filled('annee_scolaire_id')) {
+            return view('admin.eleves.index', [
+                'eleves' => collect([]), // liste vide
+                'classes' => $classes,
+                'annees' => $annees,
+            ]);
+        }
+
+        // 🔍 Recherche par nom, prénom ou matricule
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('matricule', 'like', "%{$search}%");
+            });
+        }
+
+        // 🎓 Filtre par classe
         if ($request->filled('classe_id')) {
             $query->where('classe_id', $request->classe_id);
         }
 
-        // 🔹 Filtrer par année scolaire si demandé
+        // 🏫 Filtre par année scolaire (si tu as un lien avec inscriptions)
         if ($request->filled('annee_scolaire_id')) {
-            $query->whereHas('inscriptions', function ($q) use ($request) {
+            $query->whereHas('derniereInscription', function ($q) use ($request) {
                 $q->where('annee_scolaire_id', $request->annee_scolaire_id);
             });
         }
 
-        $eleves = $query->latest()->get();
+        $eleves = $query->orderBy('nom')->get();
 
         return view('admin.eleves.index', compact('eleves', 'classes', 'annees'));
     }
+
 
     /**
      * Affiche le formulaire de création
@@ -135,5 +147,10 @@ class EleveController extends Controller
         }
 
         return redirect()->route('eleve.index')->with('success', 'Élève et tuteur supprimés ils sont liés.');
+    }
+
+    public function show($id){
+         $eleve = Eleve::with(['tuteur', 'classe'])->findOrFail($id);
+        return view('admin.eleves.show', compact('eleve'));
     }
 }

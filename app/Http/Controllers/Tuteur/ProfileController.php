@@ -47,12 +47,20 @@ class ProfileController extends Controller
             'numero' => $request->numero,
             'profession' => $request->profession,
             'adresse' => $request->adresse,
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->filled('password')) {
             $tuteur->password = Hash::make($request->password);
-            $tuteur->save();
+            
         }
+         if ($request->hasFile('photo')) {
+            $photo = $request->file('photo');
+            $photoName = time() . '_' . $photo->getClientOriginalName();
+            $photo->move(public_path('uploads/photos/tuteur'), $photoName);
+            $tuteur->photo = 'uploads/photos/tuteur/' . $photoName;
+        }
+        $tuteur->save();
 
         return redirect()->route('tuteur.profile.index')->with('success', 'Profil mis à jour avec succès !');
     }

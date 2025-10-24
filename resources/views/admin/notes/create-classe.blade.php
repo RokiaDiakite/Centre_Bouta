@@ -7,7 +7,7 @@
 
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">📝 Ajout des Notes - Par Classe</h4>
+            <h4 class="mb-0 text-white">📝 Ajout des Notes - Par Classe</h4>
             <a href="{{ route('note.index') }}" class="btn btn-warning btn-sm fw-bold px-3">⬅️ Retour</a>
         </div>
 
@@ -36,12 +36,15 @@
                         </select>
                     </div>
 
-                    <select name="matiere_id" id="matiere_id" class="form-select" required>
-                        <option value="">-- Sélectionner --</option>
-                        @foreach($matieres as $m)
-                        <option value="{{ $m->id }}" data-coefficient="{{ $m->coefficient ?? 1 }}">{{ $m->nom }}</option>
-                        @endforeach
-                    </select>
+                    <div class="col-md-3">
+                        <label>Matière</label>
+                        <select name="matiere_id" id="matiere_id" class="form-select" required>
+                            <option value="">-- Sélectionner --</option>
+                            @foreach($matieres as $m)
+                            <option value="{{ $m->id }}" data-coefficient="{{ $m->coefficient ?? 1 }}">{{ $m->nom }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
 
                     <div class="col-md-3">
@@ -72,7 +75,7 @@
                 </div>
 
                 <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success px-5 py-2 rounded-3">💾 Enregistrer les Notes</button>
+                    <button type="submit" class="btn btn-primary px-5 py-2 rounded-3">💾 Enregistrer les Notes</button>
                 </div>
             </form>
         </div>

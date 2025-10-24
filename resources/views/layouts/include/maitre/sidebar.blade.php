@@ -31,7 +31,7 @@
                 </li>
 
 
-                <li class="menu-item {{ request()->routeIs('paiement-maitre.*') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->routeIs('maitre.paiement.*') ? 'active' : '' }}">
                         <a href="{{ route('maitre.paiement.index') }}" class="menu-link">
                                 <div data-i18n="Basic">Paiements des maitres</div>
                         </a>

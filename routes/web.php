@@ -77,7 +77,8 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::get('users/show/{user}', 'show')->name('user.show');
         Route::get('users/edit/{user}', 'edit')->name('user.edit');
         Route::put('users/update/{user}', 'update')->name('user.update');
-        Route::delete('users/{user}', 'destroy')->name('user.destroy');
+        Route::put('users/activer/{user}', 'activer')->name('user.activer');
+        Route::put('users/desactiver/{user}', 'desactiver')->name('user.desactiver');
     });
 
     // Profils
@@ -166,6 +167,8 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
 
         Route::get('tuteurs/create', 'create')->name('tuteur.create');
 
+        Route::get('tuteurs/show/{id}', 'show')->name('tuteur.show');
+
         Route::post('tuteurs/store', 'store')->name('tuteur.store');
 
         Route::get('tuteurs/{id}/edit', 'edit')->name('tuteur.edit');
@@ -182,6 +185,7 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::get('eleves', 'index')->name('eleve.index');
 
         Route::get('eleves/create', 'create')->name('eleve.create');
+        Route::get('eleves/show/{id}', 'show')->name('eleve.show');
 
         Route::post('eleves/store', 'store')->name('eleve.store');
 
@@ -231,6 +235,9 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::get('/notes/eleves/{classe_id}', [NoteController::class, 'getElevesByClasse'])->name('notes.getEleves');
         Route::get('/admin/notes/evaluations', [NoteController::class, 'getEvaluations']);
     });
+    Route::get('/admin/eleves-par-classe', [App\Http\Controllers\Admin\BulletinController::class, 'getElevesParClasse'])
+        ->name('eleves.par-classe');
+
 
 
 

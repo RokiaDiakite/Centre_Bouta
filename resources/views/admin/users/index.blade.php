@@ -20,6 +20,7 @@
                         <th>Prénom</th>
                         <th>Nom utilisateur</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -32,16 +33,36 @@
                         <td>{{ $user->username }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
+                            @if($user->statut == 1)
+                                <a class="btn btn-success text-white">Active</a>
+                            @else
+                                <a class="btn btn-danger text-white">Inactif</a>
+                            @endif
+                            
+
+                        </td>
+                        <td>
                             <a href="{{ route('user.show', $user->id) }}" class="btn btn-info btn-sm">Voir</a>
                             <a href="{{ route('user.edit', $user->id) }}" class="btn btn-warning btn-sm">Modifier</a>
-                            <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display:inline-block;">
+                            @if($user->statut == 1)
+                            <form action="{{ route('user.desactiver', $user->id) }}" method="POST" style="display:inline-block;">
                                 @csrf
-                                @method('DELETE')
+                                @method('PUT')
                                 <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?')">
-                                    Supprimer
+                                    onclick="return confirm('Voulez-vous vraiment desactiver le compte de cet utilisateur ?')">
+                                    Desactiver
                                 </button>
                             </form>
+                            @else
+                            <form action="{{ route('user.activer', $user->id) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="btn btn-success btn-sm"
+                                    onclick="return confirm('Voulez-vous vraiment activer le compte de cet utilisateur ?')">
+                                    Activer
+                                </button>
+                            </form>
+                            @endif
                         </td>
                     </tr>
                     @empty

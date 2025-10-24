@@ -29,7 +29,6 @@
                         <th>Numéro</th>
                         <th>Adresse</th>
                         <th>Profession</th>
-                        <th>Nom utilisateur</th>
                         <th>Email</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -43,15 +42,17 @@
                         <td>{{ $data->numero }}</td>
                         <td>{{ $data->adresse }}</td>
                         <td>{{ $data->profession }}</td>
-                        <td>{{ $data->username }}</td>
                         <td>{{ $data->email }}</td>
                         <td class="text-center">
                             <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown">
+                                <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                 </button>
                                 <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{{ route('tuteur.show', $data->id) }}">
+                                        <i class="bx bx-eye me-1" ></i>
+                                        Voir
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('tuteur.edit', $data->id) }}">
                                         <i class="bx bx-edit-alt me-1"></i> Modifier
                                     </a>

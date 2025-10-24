@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Modifier mon Profil</h2>
 
-    <form action="{{ route('maitre.profile.update') }}" method="POST" class="card shadow-sm p-4">
+    <form action="{{ route('maitre.profile.update') }}" method="POST" class="card shadow-sm p-4" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -32,6 +32,12 @@
         </div>
 
         <div class="mb-3">
+            <label for="photo" class="form-label">Photo</label>
+            <input type="file" name="photo" id="photo" class="form-control" value="{{ old('photo', $maitre->photo) }}" >
+            @error('photo') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <div class="mb-3">
             <label for="password" class="form-label">Nouveau mot de passe (facultatif)</label>
             <input type="password" name="password" id="password" class="form-control">
             @error('password') <small class="text-danger">{{ $message }}</small> @enderror
@@ -44,7 +50,7 @@
 
         <div class="text-end">
             <a href="{{ route('maitre.profile.index') }}" class="btn btn-secondary">Annuler</a>
-            <button type="submit" class="btn btn-success">Enregistrer</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
         </div>
     </form>
 </div>

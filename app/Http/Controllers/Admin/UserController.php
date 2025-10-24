@@ -71,9 +71,19 @@ class UserController extends Controller
         return redirect()->route('user.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
-    public function destroy(User $user)
+    
+
+    public function activer(Request $request, User $user)
     {
-        $user->delete();
-        return redirect()->route('user.index')->with('success', 'Utilisateur supprimé avec succès.');
+        $user->statut = 1;
+        $user->update();
+        return redirect()->route('user.index')->with('success', 'Utilisateur activer avec succès.');
+    }
+
+    public function desactiver(Request $request, User $user)
+    {
+        $user->statut = 0;
+        $user->update();
+        return redirect()->route('user.index')->with('success', 'Utilisateur desactiver avec succès.');
     }
 }

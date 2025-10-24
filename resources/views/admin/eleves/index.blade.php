@@ -13,12 +13,14 @@
         <div class="d-flex justify-content-between align-items-center px-3 py-2">
             <h5 class="card-header mb-0">Liste des élèves</h5>
         </div>
+        <!-- Filtre automatique (classe, année, recherche) -->
+        <!-- 🔍 Filtres automatiques avec style amélioré -->
+        <form method="GET" action="{{ route('eleve.index') }}" id="filterForm"
+            class="d-flex flex-wrap align-items-end gap-3 px-3 py-3">
 
-        <!-- Filtre par classe et année scolaire -->
-        <form method="GET" action="{{ route('eleve.index') }}" class="d-flex gap-3 px-3 py-3">
             <div>
-                <label for="classe_id" class="form-label">Classe :</label>
-                <select name="classe_id" id="classe_id" class="form-select" onchange="this.form.submit()">
+                <label for="classe_id" class="form-label fw-semibold" style="font-size: 15px;">Classe :</label>
+                <select name="classe_id" id="classe_id" class="form-select form-select-sm" style="font-size: 15px; min-width: 160px;">
                     <option value="">Toutes les classes</option>
                     @foreach($classes as $classe)
                     <option value="{{ $classe->id }}" {{ request('classe_id') == $classe->id ? 'selected' : '' }}>
@@ -29,9 +31,9 @@
             </div>
 
             <div>
-                <label for="annee_scolaire_id" class="form-label">Année scolaire :</label>
-                <select name="annee_scolaire_id" id="annee_scolaire_id" class="form-select" onchange="this.form.submit()">
-                    <option value="">Toutes les années</option>
+                <label for="annee_scolaire_id" class="form-label fw-semibold" style="font-size: 15px;">Année :</label>
+                <select name="annee_scolaire_id" id="annee_scolaire_id" class="form-select form-select-sm" style="font-size: 15px; min-width: 160px;">
+                    <option value="">Toutes</option>
                     @foreach($annees as $annee)
                     <option value="{{ $annee->id }}" {{ request('annee_scolaire_id') == $annee->id ? 'selected' : '' }}>
                         {{ $annee->libelle }}
@@ -39,7 +41,24 @@
                     @endforeach
                 </select>
             </div>
+
+            <div>
+                <label for="search" class="form-label fw-semibold" style="font-size: 15px;">Recherche :</label>
+                <input type="text" name="search" id="search"
+                    value="{{ request('search') }}"
+                    class="form-control form-control-sm"
+                    style="font-size: 15px; width: 220px;"
+                    placeholder="Nom, prénom ou matricule...">
+            </div>
+
+            <div>
+                <a href="{{ route('eleve.index') }}" class="btn btn-secondary btn-sm" style="font-size: 14px;">
+                    ❌ Réinitialiser
+                </a>
+            </div>
         </form>
+
+
 
         <div class="table-responsive text-nowrap">
             <table class="table table-striped">
@@ -50,14 +69,9 @@
                         <th>Nom</th>
                         <th>Prénom</th>
                         <th>Sexe</th>
-                        <th>Date naissance</th>
-                        <th>Lieu naissance</th>
                         <th>Adresse</th>
-                        <th>Nom père</th>
-                        <th>Nom mère</th>
-                        <th>Tuteur</th>
                         <th>Classe</th>
-                        <th>Année scolaire</th>
+                        <th>Année Scolaire</th>
                         <th>Statut</th>
                         <th>Actions</th>
                     </tr>
@@ -70,12 +84,7 @@
                         <td>{{ $eleve->nom }}</td>
                         <td>{{ $eleve->prenom }}</td>
                         <td>{{ $eleve->sexe }}</td>
-                        <td>{{ $eleve->date_naissance }}</td>
-                        <td>{{ $eleve->lieu_naissance }}</td>
                         <td>{{ $eleve->adresse }}</td>
-                        <td>{{ $eleve->nom_pere }}</td>
-                        <td>{{ $eleve->nom_mere }}</td>
-                        <td>{{ $eleve->tuteur?->nom }} {{ $eleve->tuteur?->prenom }}</td>
                         <td>{{ $eleve->classe?->nom }}</td>
                         <td>{{ $eleve->derniereInscription?->anneeScolaire?->libelle ?? '—' }}</td>
                         <td>{{ ucfirst($eleve->statut) }}</td>
@@ -85,6 +94,9 @@
                                     <i class="bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{{ route('eleve.show', $eleve->id) }}">
+                                        <i class="bx bx-edit-alt me-1"></i> Détail
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('eleve.edit', $eleve->id) }}">
                                         <i class="bx bx-edit-alt me-1"></i> Modifier
                                     </a>
@@ -100,7 +112,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="15" class="text-center">Aucun élève trouvé.</td>
+                        <td colspan="15" class="text-center">Utilise les filtres.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -108,4 +120,23 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('filterForm');
+        const searchInput = document.getElementById('search');
+        const selects = form.querySelectorAll('select');
+
+        let timeout = null;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => form.submit(), 500);
+        });
+
+        selects.forEach(select => {
+            select.addEventListener('change', () => form.submit());
+        });
+    });
+</script>
+
+
 @endsection

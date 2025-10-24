@@ -78,7 +78,6 @@
                     <button type="button" class="btn btn-secondary prev-step">Précédent</button>
                     <button type="button" class="btn btn-primary next-step">Suivant</button>
                 </div>
-
                 <!-- Étape 3 : Inscription -->
                 <div class="step step-3" style="display:none;">
                     <h4>Inscription</h4>
@@ -104,7 +103,7 @@
                         <div class="col-md-6 mb-3"><label>Frais d’inscription</label><input type="number" name="frais_ins" class="form-control" step="0.01" min="0" required></div>
                     </div>
                     <button type="button" class="btn btn-secondary prev-step">Précédent</button>
-                    <button type="submit" class="btn btn-success">Terminer l’inscription</button>
+                    <button type="submit" class="btn btn-primary">Terminer l’inscription</button>
                 </div>
 
             </form>

@@ -60,8 +60,8 @@
     <!-- Tableau de notes -->
     @if(isset($notes) && count($notes) > 0)
     <div class="printable">
-    <h1 style="text-align:center;">Complexe Scolaire Centre Bouta</h1>
-    <h2 style="text-align:center;">Fiche de notes</h2>
+        <h1 style="text-align:center;">Complexe Scolaire Centre Bouta</h1>
+        <h2 style="text-align:center;">Fiche de notes</h2>
         <p style="text-align:center;">
             Année: {{ $annee->libelle }} | Classe: {{ $classe->nom }} | Matière: {{ $matiere->nom }} | Évaluation: {{ $evaluation->nom }}
         </p>
@@ -74,6 +74,7 @@
                         <th>Note devoir</th>
                         <th>Note évaluation</th>
                         <th>Coefficient</th>
+                        <th class="no-print">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,6 +84,18 @@
                         <td>{{ $note->note_devoir ?? '-' }}</td>
                         <td>{{ $note->note_evaluation ?? '-' }}</td>
                         <td>{{ $note->matiere->coefficient ?? '-' }}</td>
+                        <td class="no-print">
+                            <a href="{{ route('note.edit', $note->id) }}" class="btn btn-sm btn-primary">
+                                ✏️ Modifier
+                            </a>
+
+                            <form action="{{ route('note.destroy', $note->id) }}" method="POST" style="display:inline;"
+                                onsubmit="return confirmDelete(event)">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">🗑 Supprimer</button>
+                            </form>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -108,5 +121,15 @@
         }
     }
 </style>
+<script>
+    function confirmDelete(e) {
+        if (!confirm('❗️Voulez-vous vraiment supprimer cette note ?')) {
+            e.preventDefault();
+            return false;
+        }
+        return true;
+    }
+</script>
+
 
 @endsection
