@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Classe;
 use App\Models\Eleve;
-use App\Models\FraisScolaire;
-use App\Models\AnneeScolaire;
+use App\Models\Classe;
+use App\Models\Inscription;
 use Illuminate\Http\Request;
+use App\Models\AnneeScolaire;
+use App\Models\FraisScolaire;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\JsonResponse;
 
 class FraisScolaireController extends Controller
 {
@@ -42,21 +43,60 @@ class FraisScolaireController extends Controller
     /**
      * Retourne la liste des élèves d'une classe donnée
      */
-    public function getEleves(Request $request): JsonResponse
+    /*  public function getEleves(Request $request): JsonResponse
     {
         $classe_id = $request->query('classe_id');
+        $annee_id = $request->query('annee_scolaire_id');
 
-        if (!$classe_id) {
+        if (!$classe_id || !$annee_id) {
             return response()->json([]);
         }
 
-        // Tous les élèves inscrits dans cette classe
-        $eleves = Eleve::where('classe_id', $classe_id)
-            ->orderBy('nom')
-            ->get(['id', 'matricule', 'nom', 'prenom']);
+        // On récupère les élèves inscrits pour cette année et cette classe
+        $inscriptions = Inscription::with('eleve')
+            ->where('classe_id', $classe_id)
+            ->where('annee_scolaire_id', $annee_id)
+            ->get();
+
+        $eleves = $inscriptions->map(fn($i) => [
+            'id' => $i->eleve->id,
+            'matricule' => $i->eleve->matricule,
+            'nom' => $i->eleve->nom,
+            'prenom' => $i->eleve->prenom,
+        ]);
+
+        return response()->json($eleves);
+    } */
+    // ✅ Corrigé dans FraisScolaireController
+    public function getEleves(Request $request): JsonResponse
+    {
+        $classe_id = $request->query('classe_id');
+        $annee_id = $request->query('annee_scolaire_id');
+
+        if (!$classe_id || !$annee_id) {
+            return response()->json([]);
+        }
+
+        // 🔹 On cherche dans la table inscriptions
+        $inscriptions = \App\Models\Inscription::with('eleve')
+            ->where('classe_id', $classe_id)
+            ->where('annee_scolaire_id', $annee_id)
+            ->get();
+
+        // 🔹 On renvoie uniquement les infos de l’élève
+        $eleves = $inscriptions->map(function ($inscription) {
+            return [
+                'id' => $inscription->eleve->id,
+                'matricule' => $inscription->eleve->matricule,
+                'nom' => $inscription->eleve->nom,
+                'prenom' => $inscription->eleve->prenom,
+            ];
+        });
 
         return response()->json($eleves);
     }
+
+
 
 
 
@@ -85,13 +125,31 @@ class FraisScolaireController extends Controller
             'mode_de_paiement' => 'required|in:chèque,espèce,orange money,wave,moov money',
             'numero_recu' => 'required|string|max:255',
             'fichier_pdf' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-            'camera_image' => 'nullable|string',
         ]);
 
         $classe = Classe::findOrFail($request->classe_id);
 
-        if ($request->montant_paye > $classe->frais) {
-            return back()->withErrors(['montant_paye' => 'Le montant payé ne peut pas dépasser le montant total (' . $classe->frais . ' FCFA).']);
+        // 1️⃣ Vérifier le montant déjà payé par l'élève pour cette année et cette classe
+        $totalDejaPaye = FraisScolaire::where('eleve_id', $request->eleve_id)
+            ->where('classe_id', $request->classe_id)
+            ->where('annee_scolaire_id', $request->annee_scolaire_id)
+            ->sum('montant_paye');
+
+        $montantTotal = $classe->frais;
+        $reliquat = $montantTotal - $totalDejaPaye;
+
+        // 2️⃣ Si tout est déjà payé
+        if ($reliquat <= 0) {
+            return back()->withErrors([
+                'montant_paye' => "Tout le montant scolaire de cet élève est déjà payé."
+            ]);
+        }
+
+        // 3️⃣ Vérifier que le montant payé ne dépasse pas le reliquat
+        if ($request->montant_paye > $reliquat) {
+            return back()->withErrors([
+                'montant_paye' => "Le montant payé ne peut pas dépasser le reste dû : $reliquat FCFA."
+            ]);
         }
 
         $data = $request->only([
@@ -104,24 +162,18 @@ class FraisScolaireController extends Controller
             'numero_recu'
         ]);
 
-        $data['montant_total'] = $classe->frais;
-        $data['reliquat'] = $classe->frais - $request->montant_paye;
+        $data['montant_total'] = $montantTotal;
+        $data['reliquat'] = $reliquat - $request->montant_paye;
 
-        // Gestion du fichier ou de la capture
         if ($request->hasFile('fichier_pdf')) {
             $data['fichier_pdf'] = $request->file('fichier_pdf')->store('frais_pdfs', 'public');
-        } elseif ($request->camera_image) {
-            $imageData = str_replace('data:image/png;base64,', '', $request->camera_image);
-            $imageData = str_replace(' ', '+', $imageData);
-            $fileName = 'frais_pdfs/' . uniqid() . '.png';
-            Storage::disk('public')->put($fileName, base64_decode($imageData));
-            $data['fichier_pdf'] = $fileName;
         }
 
         FraisScolaire::create($data);
 
         return redirect()->route('frais.index')->with('success', 'Frais scolaire ajouté avec succès.');
     }
+
 
     public function edit(FraisScolaire $frais)
     {
@@ -225,10 +277,16 @@ class FraisScolaireController extends Controller
         $eleves = collect();
         $paiements = collect();
 
-        if ($classeId) {
-            $eleves = Eleve::where('classe_id', $classeId)->orderBy('nom')->get();
+        // 🔹 Charger les élèves selon les inscriptions
+        if ($classeId && $anneeId) {
+            $eleves = \App\Models\Inscription::with('eleve')
+                ->where('classe_id', $classeId)
+                ->where('annee_scolaire_id', $anneeId)
+                ->get()
+                ->pluck('eleve');
         }
 
+        // 🔹 Charger les paiements si tout est sélectionné
         if ($anneeId && $classeId && $eleveId) {
             $paiements = FraisScolaire::with(['classe', 'anneeScolaire', 'eleve'])
                 ->where('annee_scolaire_id', $anneeId)

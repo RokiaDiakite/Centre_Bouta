@@ -46,8 +46,8 @@
 
     <nav id="navmenu" class="navmenu">
       <ul>
-        <li><a href="#hero" class="active">Home</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#hero" class="active">Acceuil</a></li>
+        <li><a href="#about">A propos</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -207,7 +207,7 @@
         <!-- You can delete the links only if you've purchased the pro version. -->
         <!-- Licensing information: https://bootstrapmade.com/license/ -->
         <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-        Designed by <a href="https://mdt-informatique.ml/">MDT_Informatique</a>
+        Développer par <a href="https://mdt-informatique.ml/">MDT_Informatique</a>
       </div>
     </div>
 

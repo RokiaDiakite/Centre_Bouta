@@ -1,131 +1,94 @@
 @extends("layouts.admin")
 @section("content")
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Forms/</span> Modification d'eleves</h4>
+    <div class="card mx-auto" style="max-width: 900px; padding: 20px;">
+        <h4 class="fw-bold py-3 mb-4 text-center">
+            {{ isset($eleve) ? 'Modifier un élève' : 'Ajouter un élève' }}
+        </h4>
 
-    <!-- Basic Layout & Basic with Icons -->
-    <div class="row">
-        <!-- Basic Layout -->
-        <div class="col-xxl">
-            <div class="card mb-4">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Modifier un élève</h5>
-                    <a class="btn btn-secondary float-end" href="{{route('eleve.index')}}">retour</a>
+        @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>@foreach($errors->all() as $err)<li>{{ $err }}</li>@endforeach</ul>
+        </div>
+        @endif
+
+        <form method="POST" action="{{ isset($eleve) ? route('eleve.update', $eleve->id) : route('eleve.store') }}">
+            @csrf
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label>Matricule</label>
+                    <input type="text" name="matricule" value="{{ $eleve->matricule ?? '' }}" class="form-control" required>
                 </div>
-                @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-
-                        @foreach($errors->all() as $err)
-                        <li>{{ $err }}</li>
-
+                <div class="col-md-6">
+                    <label>Nom</label>
+                    <input type="text" name="nom" value="{{ $eleve->nom ?? '' }}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label>Prénom</label>
+                    <input type="text" name="prenom" value="{{ $eleve->prenom ?? '' }}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label>Date naissance</label>
+                    <input type="date" name="date_naissance" value="{{ $eleve->date_naissance ?? '' }}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label>Lieu naissance</label>
+                    <input type="text" name="lieu_naissance" value="{{ $eleve->lieu_naissance ?? '' }}" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label>Adresse</label>
+                    <input type="text" name="adresse" value="{{ $eleve->adresse ?? '' }}" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label>Nom père</label>
+                    <input type="text" name="nom_pere" value="{{ $eleve->nom_pere ?? '' }}" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label>Nom mère</label>
+                    <input type="text" name="nom_mere" value="{{ $eleve->nom_mere ?? '' }}" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label>Sexe</label>
+                    <select name="sexe" class="form-control" required>
+                        <option value="M" {{ (isset($eleve) && $eleve->sexe=='M')?'selected':'' }}>Masculin</option>
+                        <option value="F" {{ (isset($eleve) && $eleve->sexe=='F')?'selected':'' }}>Féminin</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Statut</label>
+                    <select name="statut" class="form-control" required>
+                        <option value="actif" {{ (isset($eleve) && $eleve->statut=='actif')?'selected':'' }}>Actif</option>
+                        <option value="absent" {{ (isset($eleve) && $eleve->statut=='absent')?'selected':'' }}>Absent</option>
+                        <option value="abandon" {{ (isset($eleve) && $eleve->statut=='abandon')?'selected':'' }}>Abandon</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Tuteur</label>
+                    <select name="tuteur_id" class="form-control" required>
+                        @foreach($tuteurs as $tuteur)
+                        <option value="{{ $tuteur->id }}" {{ (isset($eleve) && $eleve->tuteur_id==$tuteur->id)?'selected':'' }}>
+                            {{ $tuteur->nom }} {{ $tuteur->prenom }}
+                        </option>
                         @endforeach
-                    </ul>
+                    </select>
                 </div>
-
-                @endif
-
-                <div class="card-body">
-                    <form action="{{ route('eleve.update', $eleve->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="id" value="{{$eleve->id}}">
-                        <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label" for="basic-default-name">Matricule</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->matricule}}" name="matricule" placeholder="" />
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label" for="basic-default-name">Nom</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->nom}}" name="nom" placeholder="" />
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label" for="basic-default-name">Prenom</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->prenom}}" name="prenom" placeholder="" />
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-2 col-form-label" for="basic-default-name">Date Naissance</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->date_naissance}}" name="date_naissance" placeholder="" />
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="basic-default-name">Lieu Naissance</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->lieu_naissance}}" name="lieu_naissance" placeholder="" />
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="basic-default-name">Adresse</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->adresse}}" name="adresse" placeholder="" />
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="basic-default-name">Nom père</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->nom_pere}}" name="nom_pere" placeholder="" />
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label" for="basic-default-name">Nom mère</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="basic-default-name" value="{{$eleve->nom_mere}}" name="nom_mere" placeholder="" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Sexe</label>
-                                <select name="eleve_sexe" class="form-control" required>
-                                    <option value="">-- Sélectionnez --</option>
-                                    <option value="M" {{ old('eleve_sexe', $eleve->sexe ?? '') == 'M' ? 'selected' : '' }}>Masculin</option>
-                                    <option value="F" {{ old('eleve_sexe', $eleve->sexe ?? '') == 'F' ? 'selected' : '' }}>Féminin</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label>Statut</label>
-                                <select name="eleve_statut" class="form-control" required>
-                                    <option value="">-- Sélectionnez --</option>
-                                    <option value="actif" {{ old('eleve_statut', $eleve->statut ?? '') == 'actif' ? 'selected' : '' }}>Actif</option>
-                                    <option value="absent" {{ old('eleve_statut', $eleve->statut ?? '') == 'absent' ? 'selected' : '' }}>Absent</option>
-                                    <option value="abandon" {{ old('eleve_statut', $eleve->statut ?? '') == 'abandon' ? 'selected' : '' }}>Abandon</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label>Tuteur</label>
-                                <select name="tuteur_id" class="form-control" required>
-                                    @foreach ($tuteurs as $tuteur)
-                                    <option value="{{ $tuteur->id }}" {{ $eleve->tuteur_id == $tuteur->id ? 'selected' : '' }}>
-                                        {{ $tuteur->nom }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Classe</label>
-                                <select name="classe_id" class="form-control" required>
-                                    @foreach ($classes as $classe)
-                                    <option value="{{ $classe->id }}" {{ $eleve->classe_id == $classe->id ? 'selected' : '' }}>
-                                        {{ $classe->nom }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-
-                            <div class="row justify-content-end">
-                                <div class="col-sm-10">
-                                    <button type="submit" class="btn btn-primary">Modifier</button>
-                                </div>
-                            </div>
-                    </form>
+                <div class="col-md-6">
+                    <label>Classe</label>
+                    <select name="classe_id" class="form-control">
+                        <option value="">-- Choisir --</option>
+                        @foreach($classes as $classe)
+                        <option value="{{ $classe->id }}" {{ (isset($eleve) && $eleve->classe_id==$classe->id)?'selected':'' }}>
+                            {{ $classe->nom }}
+                        </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
-        </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary">{{ isset($eleve) ? 'Enregistrer' : 'Ajouter' }}</button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

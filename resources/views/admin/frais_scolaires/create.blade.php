@@ -101,16 +101,19 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const classeSelect = document.getElementById('classe_id');
+        const anneeSelect = document.getElementById('annee_scolaire_id');
         const eleveSelect = document.getElementById('eleve_id');
         const montantTotal = document.getElementById('montant_total');
 
-        // Charger les élèves quand la classe change
-        classeSelect.addEventListener('change', function() {
-            const classeId = this.value;
+        function loadEleves() {
+            const classeId = classeSelect.value;
+            const anneeId = anneeSelect.value;
 
-            if (classeId) {
-                // Charger les élèves de la classe
-                fetch(`{{ route('frais.eleve') }}?classe_id=${classeId}`)
+            if (classeId && anneeId) {
+                eleveSelect.innerHTML = '<option value="">Chargement...</option>';
+
+                // 🔹 Charger les élèves selon la classe et l’année
+                fetch(`{{ route('frais.eleve') }}?classe_id=${classeId}&annee_scolaire_id=${anneeId}`)
                     .then(res => res.json())
                     .then(data => {
                         eleveSelect.innerHTML = '<option value="">-- Sélectionner un élève --</option>';
@@ -118,9 +121,12 @@
                             eleveSelect.innerHTML += `<option value="${eleve.id}">${eleve.matricule ?? ''} - ${eleve.nom} ${eleve.prenom}</option>`;
                         });
                     })
-                    .catch(err => console.error('Erreur chargement élèves:', err));
+                    .catch(err => {
+                        console.error('Erreur chargement élèves:', err);
+                        eleveSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
 
-                // Charger le montant total de la classe
+                // 🔹 Charger le montant total de la classe
                 fetch(`{{ route('frais.getFrais', '') }}/${classeId}`)
                     .then(res => res.json())
                     .then(data => {
@@ -131,9 +137,14 @@
                 eleveSelect.innerHTML = '<option value="">-- Sélectionner un élève --</option>';
                 montantTotal.value = '';
             }
-        });
+        }
+
+        // 🔹 Événements
+        classeSelect.addEventListener('change', loadEleves);
+        anneeSelect.addEventListener('change', loadEleves);
     });
 </script>
+
 
 
 @endsection

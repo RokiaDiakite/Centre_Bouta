@@ -19,16 +19,26 @@ class Inscription extends Model
 
     public function eleve()
     {
-        return $this->belongsTo(Eleve::class, 'eleve_id')->withDefault();
-    }
-
-    public function anneeScolaire()
-    {
-        return $this->belongsTo(AnneeScolaire::class, 'annee_scolaire_id');
+        return $this->belongsTo(Eleve::class);
     }
 
     public function classe()
     {
         return $this->belongsTo(Classe::class);
+    }
+
+    public function anneeScolaire()
+    {
+        return $this->belongsTo(AnneeScolaire::class);
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($inscription) {
+            if ($inscription->eleve) {
+                $inscription->eleve->tuteur?->delete();
+                $inscription->eleve->delete();
+            }
+        });
     }
 }

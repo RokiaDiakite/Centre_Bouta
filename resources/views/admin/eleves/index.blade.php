@@ -1,22 +1,21 @@
 @extends("layouts.admin")
 @section("content")
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Élèves</h4>
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Tables /</span> Élèves
+    </h4>
 
-    <!-- Basic Bootstrap Table -->
-    <div class="card">
+    <div class="card mb-4">
         @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         <div class="d-flex justify-content-between align-items-center px-3 py-2">
             <h5 class="card-header mb-0">Liste des élèves</h5>
-            <!--  <a class="btn btn-primary" href="{{ route('eleve.create') }}">Ajouter un élève</a> -->
         </div>
-        <form method="GET" action="{{ route('eleve.index') }}" class="mb-3 d-flex gap-2">
+
+        <!-- Filtre par classe et année scolaire -->
+        <form method="GET" action="{{ route('eleve.index') }}" class="d-flex gap-3 px-3 py-3">
             <div>
                 <label for="classe_id" class="form-label">Classe :</label>
                 <select name="classe_id" id="classe_id" class="form-select" onchange="this.form.submit()">
@@ -42,29 +41,6 @@
             </div>
         </form>
 
-
-        <script>
-            // ✅ Soumission automatique dès qu'on change une valeur
-            document.querySelectorAll('#filterForm select').forEach(select => {
-                select.addEventListener('change', function() {
-                    document.getElementById('filterForm').submit();
-                });
-            });
-        </script>
-
-
-        <script>
-            // ✅ Soumission automatique au changement
-            document.getElementById('classe_id').addEventListener('change', function() {
-                document.getElementById('filterForm').submit();
-            });
-
-            document.getElementById('annee_scolaire_id').addEventListener('change', function() {
-                document.getElementById('filterForm').submit();
-            });
-        </script>
-
-        <!--  -->
         <div class="table-responsive text-nowrap">
             <table class="table table-striped">
                 <thead>
@@ -73,50 +49,48 @@
                         <th>Matricule</th>
                         <th>Nom</th>
                         <th>Prénom</th>
-                        <th>Date de naissance</th>
-                        <th>Lieu de naissance</th>
                         <th>Sexe</th>
+                        <th>Date naissance</th>
+                        <th>Lieu naissance</th>
                         <th>Adresse</th>
                         <th>Nom père</th>
                         <th>Nom mère</th>
-                        <th>Statut</th>
                         <th>Tuteur</th>
                         <th>Classe</th>
+                        <th>Année scolaire</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($eleves as $data)
+                    @forelse($eleves as $eleve)
                     <tr>
-                        <td>{{ $data->id }}</td>
-                        <td><strong>{{ $data->matricule }}</strong></td>
-                        <td><strong>{{ $data->nom }}</strong></td>
-                        <td><strong>{{ $data->prenom }}</strong></td>
-                        <td>{{ $data->date_naissance }}</td>
-                        <td>{{ $data->lieu_naissance }}</td>
-                        <td>{{ $data->sexe }}</td>
-                        <td>{{ $data->adresse }}</td>
-                        <td>{{ $data->nom_pere }}</td>
-                        <td>{{ $data->nom_mere }}</td>
-                        <td>{{ $data->statut }}</td>
-                        <td>
-                            {{ $data->tuteur ? $data->tuteur->nom.' '.$data->tuteur->prenom : 'N/A' }}
-                        </td>
-                        <td>
-                            {{ $data->classe ? $data->classe->nom : 'N/A' }}
-                        </td>
+                        <td>{{ $eleve->id }}</td>
+                        <td>{{ $eleve->matricule }}</td>
+                        <td>{{ $eleve->nom }}</td>
+                        <td>{{ $eleve->prenom }}</td>
+                        <td>{{ $eleve->sexe }}</td>
+                        <td>{{ $eleve->date_naissance }}</td>
+                        <td>{{ $eleve->lieu_naissance }}</td>
+                        <td>{{ $eleve->adresse }}</td>
+                        <td>{{ $eleve->nom_pere }}</td>
+                        <td>{{ $eleve->nom_mere }}</td>
+                        <td>{{ $eleve->tuteur?->nom }} {{ $eleve->tuteur?->prenom }}</td>
+                        <td>{{ $eleve->classe?->nom }}</td>
+                        <td>{{ $eleve->derniereInscription?->anneeScolaire?->libelle ?? '—' }}</td>
+                        <td>{{ ucfirst($eleve->statut) }}</td>
                         <td>
                             <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                <button class="btn p-0 dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{{ route('eleve.edit', $data->id) }}">
+                                    <a class="dropdown-item" href="{{ route('eleve.edit', $eleve->id) }}">
                                         <i class="bx bx-edit-alt me-1"></i> Modifier
                                     </a>
-                                    <form action="{{ route('eleve.delete', $data->id) }}" method="POST" style="display:inline-block">
+                                    <form action="{{ route('eleve.delete', $eleve->id) }}" method="POST" onsubmit="return confirm('Supprimer cet élève ?')">
                                         @csrf
-                                        <button type="submit" onclick="return confirm('Voulez-vous vraiment supprimer ?')" class="btn btn-danger btn-sm">
+                                        <button type="submit" class="dropdown-item text-danger">
                                             <i class="bx bx-trash me-1"></i> Supprimer
                                         </button>
                                     </form>
@@ -126,14 +100,12 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">Aucun élève trouvé.</td>
+                        <td colspan="15" class="text-center">Aucun élève trouvé.</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-
-    <!--/ Basic Bootstrap Table -->
 </div>
 @endsection

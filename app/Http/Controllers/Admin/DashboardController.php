@@ -2,72 +2,159 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Eleve;
-use App\Models\Classe;
-use App\Models\Maitre;
-use App\Models\Depense;
-use App\Models\Inscription;
-use Illuminate\Http\Request;
-use App\Models\AnneeScolaire;
-use App\Models\FraisScolaire;
-use App\Models\PaiementMaitre;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\AnneeScolaire;
+use App\Models\Classe;
+use App\Models\Inscription;
+use App\Models\FraisScolaire;
+use App\Models\Depense;
+use App\Models\PaiementMaitre;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $anneeId = $request->input('annee_scolaire_id');
+        // 1️⃣ Charger toutes les années scolaires
+        $anneesScolaires = AnneeScolaire::orderBy('id', 'desc')->get();
 
-        // Charger toutes les années scolaires pour le filtre
-        $anneesScolaires = AnneeScolaire::all();
+        // 2️⃣ Année sélectionnée ou dernière par défaut
+        $anneeScolaireId = $request->get('annee_scolaire_id');
+        $annee = $anneeScolaireId
+            ? AnneeScolaire::find($anneeScolaireId)
+            : $anneesScolaires->first();
 
-        // Si une année scolaire est sélectionnée
-        $elevesIds = $anneeId
-            ? Inscription::where('annee_scolaire_id', $anneeId)->pluck('eleve_id')
-            : Eleve::pluck('id');
+        // 3️⃣ Année précédente
+        $anneeReference = AnneeScolaire::where('id', '<', $annee->id)
+            ->orderBy('id', 'desc')
+            ->first();
 
-        // Statistiques globales
-        $totalEleves = Eleve::whereIn('id', $elevesIds)->count();
-        $totalProfs = Maitre::count();
-        $totalPaiements = FraisScolaire::when($anneeId, fn($q) => $q->where('annee_scolaire_id', $anneeId))->sum('montant_paye');
-        $totalDepenses = Depense::when($anneeId, fn($q) => $q->where('annee_scolaire_id', $anneeId))->sum('montant');
-        $totalPaiementsMaitres = PaiementMaitre::when($anneeId, fn($q) => $q->where('annee_scolaire_id', $anneeId))->sum('montant');
+        // 4️⃣ Classes et initialisation
+        $classes = Classe::all();
+        $statsParClasse = [];
 
-        // Répartition garçons/filles
-        $nbGarcons = Eleve::whereIn('id', $elevesIds)->where('sexe', 'M')->count();
-        $nbFilles = Eleve::whereIn('id', $elevesIds)->where('sexe', 'F')->count();
+        $totalEleves = 0;
+        $nbGarcons = 0;
+        $nbFilles = 0;
+        $totalChiffreAffaires = 0;
+        $totalMontantPaye = 0;
 
-        // Statistiques par classe
-        $statsParClasse = Classe::select('id', 'nom')->get()->map(function ($classe) use ($anneeId) {
-            $elevesClasse = Inscription::where('classe_id', $classe->id)
-                ->when($anneeId, fn($q) => $q->where('annee_scolaire_id', $anneeId))
-                ->pluck('eleve_id');
+        // 💰 Paiements et dépenses global pour l’année
+        $totalPaiementMaitre = PaiementMaitre::where('annee_scolaire_id', $annee->id)->sum('montant');
+        $totalDepense = Depense::where('annee_scolaire_id', $annee->id)->sum('montant');
 
-            $garcons = Eleve::whereIn('id', $elevesClasse)->where('sexe', 'M')->count();
-            $filles = Eleve::whereIn('id', $elevesClasse)->where('sexe', 'F')->count();
+        foreach ($classes as $classe) {
+            // Inscriptions pour la classe et l’année
+            $inscriptions = Inscription::with('eleve')
+                ->where('classe_id', $classe->id)
+                ->where('annee_scolaire_id', $annee->id)
+                ->get();
 
-            return [
-                'id' => $classe->id,
+            $nbTotal = $inscriptions->count();
+            $garcons = $inscriptions->filter(fn($i) => $i->eleve && $i->eleve->sexe === 'M')->count();
+            $filles = $inscriptions->filter(fn($i) => $i->eleve && $i->eleve->sexe === 'F')->count();
+
+            // Chiffre d’affaires attendu = frais de la classe × nombre d’élèves
+            $chiffreAffaires = $classe->frais * $nbTotal;
+
+            // Montant payé pour la classe
+            $montantPaye = FraisScolaire::where('classe_id', $classe->id)
+                ->where('annee_scolaire_id', $annee->id)
+                ->sum('montant_paye');
+
+            // Reliquat = chiffre d’affaires - montant payé
+            $reliquat = $chiffreAffaires - $montantPaye;
+
+            $statsParClasse[] = [
                 'nom' => $classe->nom,
-                'total' => $elevesClasse->count(),
+                'total' => $nbTotal,
                 'garcons' => $garcons,
                 'filles' => $filles,
+                'chiffreAffaires' => $chiffreAffaires,
+                'montantPaye' => $montantPaye,
+                'reliquat' => $reliquat,
+                'paiementMaitre' => $totalPaiementMaitre,
+                'depense' => $totalDepense,
             ];
-        });
+
+            // Cumuls globaux
+            $totalEleves += $nbTotal;
+            $nbGarcons += $garcons;
+            $nbFilles += $filles;
+            $totalChiffreAffaires += $chiffreAffaires;
+            $totalMontantPaye += $montantPaye;
+        }
+
+        // Totaux globaux
+        $totaux = [
+            'nbEleves' => $totalEleves,
+            'chiffreAffaires' => $totalChiffreAffaires,
+            'montantPaye' => $totalMontantPaye,
+            'reliquat' => $totalChiffreAffaires - $totalMontantPaye,
+            'paiementMaitre' => $totalPaiementMaitre,
+            'depense' => $totalDepense,
+        ];
+
+        // Taux de recouvrement
+        $tauxRecouvrement = $totalChiffreAffaires > 0
+            ? round(($totalMontantPaye / $totalChiffreAffaires) * 100, 2)
+            : 0;
+
+        // Comparaison avec l’année précédente
+        $comparaison = [
+            'nbEleves' => 0,
+            'chiffreAffaires' => 0,
+        ];
+
+        if ($anneeReference) {
+            $elevesAnneePrec = Inscription::where('annee_scolaire_id', $anneeReference->id)->count();
+
+            $chiffreAffairesPrec = 0;
+            foreach (Classe::all() as $classePrec) {
+                $nbPrec = Inscription::where('classe_id', $classePrec->id)
+                    ->where('annee_scolaire_id', $anneeReference->id)
+                    ->count();
+                $chiffreAffairesPrec += $classePrec->frais * $nbPrec;
+            }
+
+            $comparaison['nbEleves'] = $elevesAnneePrec > 0
+                ? round(($totalEleves / $elevesAnneePrec) * 100, 2)
+                : 100;
+
+            $comparaison['chiffreAffaires'] = $chiffreAffairesPrec > 0
+                ? round(($totalChiffreAffaires / $chiffreAffairesPrec) * 100, 2)
+                : 100;
+        }
+
+        // Graphiques
+        $sexeChartData = [
+            'labels' => ['Garçons', 'Filles'],
+            'data' => [$nbGarcons, $nbFilles],
+        ];
+
+        $financeChartData = [
+            'labels' => ['Chiffre d’affaires', 'Montant payé', 'Dépenses'],
+            'data' => [$totalChiffreAffaires, $totalMontantPaye, $totalDepense],
+        ];
+
+        $classeChartData = [
+            'labels' => array_column($statsParClasse, 'nom'),
+            'data' => array_column($statsParClasse, 'total'),
+        ];
 
         return view('admin.dashboard', compact(
             'anneesScolaires',
-            'anneeId',
-            'totalEleves',
-            'totalProfs',
-            'totalPaiements',
-            'totalDepenses',
-            'totalPaiementsMaitres',
+            'annee',
+            'anneeReference',
+            'statsParClasse',
+            'totaux',
             'nbGarcons',
             'nbFilles',
-            'statsParClasse'
+            'comparaison',
+            'tauxRecouvrement',
+            'sexeChartData',
+            'financeChartData',
+            'classeChartData'
         ));
     }
 }

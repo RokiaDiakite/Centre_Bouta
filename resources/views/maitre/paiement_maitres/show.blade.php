@@ -13,7 +13,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>Montant :</strong>
-                    {{ number_format($paiement->montant, 2, ',', ' ') }} €
+                    {{ number_format($paiement->montant, 2, ',', ' ') }} FCFA
                 </li>
 
                 <li class="list-group-item">
@@ -28,7 +28,7 @@
 
                 <li class="list-group-item">
                     <strong>Année Scolaire :</strong>
-                    {{ $paiement->anneeScolaire->annee ?? 'Non spécifiée' }}
+                    {{ $paiement->anneeScolaire->libelle ?? 'Non spécifiée' }}
                 </li>
 
                 

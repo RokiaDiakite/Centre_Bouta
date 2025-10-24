@@ -69,14 +69,14 @@
         <div class="layout-container">
 
             <!-- Sidebar -->
-            @include('layouts.include.tuteur.sidebar')
+            @include('layouts.include.maitre.sidebar')
             <!-- /Sidebar -->
 
             <!-- Layout page -->
             <div class="layout-page">
 
                 <!-- Header / Navbar -->
-                @include('layouts.include.tuteur.header')
+                @include('layouts.include.maitre.header')
                 <!-- /Header -->
 
                 <!-- Content wrapper -->
@@ -89,7 +89,7 @@
                     <!-- /Main content -->
 
                     <!-- Footer -->
-                    @include('layouts.include.tuteur.footer')
+                    @include('layouts.include.maitre.footer')
                     <!-- /Footer -->
 
                     <div class="content-backdrop fade"></div>

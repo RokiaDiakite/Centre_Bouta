@@ -24,10 +24,10 @@
             @foreach($paiements as $paiement)
             <tr>
                 <td>{{ ucfirst($paiement->mois) }}</td>
-                <td>{{ number_format($paiement->montant, 2, ',', ' ') }} €</td>
+                <td>{{ number_format($paiement->montant, 2, ',', ' ') }} FCFA</td>
                 <td>{{ \Carbon\Carbon::parse($paiement->date_paiement)->format('d/m/Y') }}</td>
                 <td>{{ $paiement->mode_paiement ?? '-' }}</td>
-                <td>{{ $paiement->anneeScolaire->annee ?? '-' }}</td>
+                <td>{{ $paiement->anneeScolaire->libelle ?? '-' }}</td>
                 <td class="text-center">
                     <a href="{{ route('maitre.paiement.show', $paiement->id) }}" class="btn btn-sm btn-primary">
                         Voir détails

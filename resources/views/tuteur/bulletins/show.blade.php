@@ -18,8 +18,8 @@
         </div>
 
         <div class="text-center mb-3 no-print">
-            <a href="{{ route('tuteur.bulletin.index') }}" class="btn btn-sm btn-secondary">⬅ Retour</a>
-            <a href="{{ route('tuteur.bulletin.download', $eleve->id) }}" class="btn btn-sm btn-primary">📄 Télécharger PDF</a>
+            <a href="{{ route('tuteur.bulletin.index') }}" class="btn btn-sm btn-secondary">⬅ Retour</a><!-- 
+            <a href="{{ route('tuteur.bulletin.download', $eleve->id) }}" class="btn btn-sm btn-primary">📄 Télécharger PDF</a> -->
         </div>
 
         @if($notes->isEmpty())

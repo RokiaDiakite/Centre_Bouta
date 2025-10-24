@@ -15,8 +15,8 @@
         <li class="list-group-item d-flex justify-content-between align-items-center">
             {{ $eleve->nom }} {{ $eleve->prenom }} ({{ $eleve->classe->nom ?? '-' }})
             <span>
-                <a href="{{ route('tuteur.bulletin.show', $eleve->id) }}" class="btn btn-primary btn-sm">Voir</a>
-                <a href="{{ route('tuteur.bulletin.download', $eleve->id) }}" class="btn btn-success btn-sm">Télécharger PDF</a>
+                <a href="{{ route('tuteur.bulletin.show', $eleve->id) }}" class="btn btn-primary btn-sm">Voir</a><!-- 
+                <a href="{{ route('tuteur.bulletin.download', $eleve->id) }}" class="btn btn-success btn-sm">Télécharger PDF</a> -->
             </span>
         </li>
         @endforeach

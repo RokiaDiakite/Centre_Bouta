@@ -7,184 +7,133 @@ use App\Models\Classe;
 use App\Models\Tuteur;
 use Illuminate\Http\Request;
 use App\Models\AnneeScolaire;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 
 class EleveController extends Controller
 {
+    /**
+     * Affiche la liste des élèves
+     */
     public function index(Request $request)
     {
         $classes = Classe::all();
-        $annees  = AnneeScolaire::all();
+        $annees = AnneeScolaire::all();
 
-        $query = Eleve::with(['tuteur', 'classe', 'inscriptions.anneeScolaire']);
+        // 🔹 Charger les élèves avec tuteur, classe et dernière inscription
+        $query = Eleve::with([
+            'tuteur',
+            'classe',
+            'inscriptions' => function ($q) {
+                $q->orderByDesc('created_at')->limit(1);
+            },
+            'inscriptions.anneeScolaire',
+        ]);
 
-        // Filtrer par classe si sélectionnée
+        // 🔹 Filtrer par classe si demandé
         if ($request->filled('classe_id')) {
             $query->where('classe_id', $request->classe_id);
         }
 
-        // Filtrer par année scolaire si sélectionnée
+        // 🔹 Filtrer par année scolaire si demandé
         if ($request->filled('annee_scolaire_id')) {
             $query->whereHas('inscriptions', function ($q) use ($request) {
                 $q->where('annee_scolaire_id', $request->annee_scolaire_id);
             });
         }
 
-        $eleves = $query->get();
+        $eleves = $query->latest()->get();
 
         return view('admin.eleves.index', compact('eleves', 'classes', 'annees'));
     }
 
-
-
-
     /**
-     * Afficher le formulaire de création
+     * Affiche le formulaire de création
      */
     public function create()
     {
-        $tuteurs = Tuteur::all();
         $classes = Classe::all();
-        return view('admin.eleves.create', compact('tuteurs', 'classes'));
+        $tuteurs = Tuteur::all();
+        return view('admin.eleves.create', compact('classes', 'tuteurs'));
     }
 
     /**
-     * Ajouter un nouvel élève avec son tuteur
+     * Enregistre un nouvel élève
      */
     public function store(Request $request)
     {
         $request->validate([
-            // Tuteur
-            'tuteur_nom'      => 'required|string',
-            'tuteur_prenom'   => 'required|string',
-            'tuteur_email'    => 'required|email|unique:tuteurs,email',
-            'tuteur_password' => 'required|string|min:6',
-            'tuteur_adresse'  => 'nullable|string',
-            'tuteur_numero'   => 'nullable|string',
-            'tuteur_username'   => 'nullable|string',
-            'tuteur_profession'   => 'nullable|string',
-            // Eleve
-            'eleve_nom'            => 'required|string',
-            'eleve_prenom'         => 'required|string',
-            'eleve_date_naissance' => 'required|date',
-            'eleve_lieu_naissance' => 'required|string',
-            'eleve_nom_pere' => 'required|string',
-            'eleve_nom_mere' => 'required|string',
-            'eleve_sexe' => 'required|string',
-            'eleve_adresse'        => 'nullable|string',
-            'eleve_statut' => 'required|string',
-            'classe_id'            => 'required|exists:classes,id',
+            'matricule' => 'required|unique:eleves,matricule',
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'sexe' => 'required|in:M,F',
+            'date_naissance' => 'nullable|date',
+            'lieu_naissance' => 'nullable|string|max:255',
+            'adresse' => 'nullable|string|max:255',
+            'nom_pere' => 'nullable|string|max:255',
+            'nom_mere' => 'nullable|string|max:255',
+            'tuteur_id' => 'required|exists:tuteurs,id',
+            'classe_id' => 'nullable|exists:classes,id',
+            'statut' => 'required|in:actif,absent,abandon'
         ]);
 
-        DB::beginTransaction();
+        Eleve::create($request->all());
 
-        try {
-            // Création du tuteur
-            $tuteur = Tuteur::create([
-                'nom'      => $request->tuteur_nom,
-                'prenom'   => $request->tuteur_prenom,
-                'email'    => $request->tuteur_email,
-                'username'   => $request->tuteur_username,
-                'password' => Hash::make($request->tuteur_password),
-                'adresse'  => $request->tuteur_adresse,
-                'numero'   => $request->tuteur_numero,
-                'profession'   => $request->tuteur_profession,
-
-            ]);
-
-            // Création de l'élève
-            $eleve = Eleve::create([
-                'matricule'      => 'MAT' . rand(0000, 9999),
-                'nom'            => $request->eleve_nom,
-                'prenom'         => $request->eleve_prenom,
-                'date_naissance' => $request->eleve_date_naissance,
-                'lieu_naissance' => $request->eleve_lieu_naissance,
-                'nom_pere'            => $request->eleve_nom_pere,
-                'nom_mere'            => $request->eleve_nom_mere,
-                'sexe'            => $request->eleve_sexe,
-                'statut'            => $request->eleve_statut,
-                'adresse'        => $request->eleve_adresse,
-                'tuteur_id'      => $tuteur->id,
-                'classe_id'      => $request->classe_id, // ✅ ajout obligatoire
-            ]);
-
-
-
-            DB::commit();
-
-            return redirect()->route('eleve.index')
-                ->with('success', 'Élève ajouté avec succès !');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Erreur lors de l’ajout de l’élève : ' . $e->getMessage());
-        }
+        return redirect()->route('eleve.index')->with('success', 'Élève ajouté avec succès.');
     }
 
     /**
-     * Afficher le formulaire d'édition
+     * Affiche le formulaire d'édition
      */
     public function edit($id)
     {
-        $eleve = Eleve::findOrFail($id);
-        $tuteurs = Tuteur::all();
+        $eleve = Eleve::with(['tuteur', 'classe'])->findOrFail($id);
         $classes = Classe::all();
-
-        return view('admin.eleves.edit', compact('eleve', 'tuteurs', 'classes'));
+        $tuteurs = Tuteur::all();
+        return view('admin.eleves.edit', compact('eleve', 'classes', 'tuteurs'));
     }
 
-
     /**
-     * Mettre à jour un élève
+     * Met à jour un élève
      */
     public function update(Request $request, $id)
     {
         $eleve = Eleve::findOrFail($id);
 
         $request->validate([
-            'tuteur_id'      => 'required|exists:tuteurs,id',
-            'classe_id'      => 'required|exists:classes,id',
-            'nom'            => 'required|string',
-            'prenom'         => 'required|string',
-            'date_naissance' => 'required|date',
-            'lieu_naissance' => 'required|string',
-            'adresse'        => 'nullable|string',
-            'nom_pere'       => 'required|string',
-            'nom_mere'       => 'required|string',
-            'eleve_sexe'   => 'required|in:M,F',
-            'eleve_statut' => 'required|in:actif,absent,abandon',
-
+            'matricule' => 'required|unique:eleves,matricule,' . $eleve->id,
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'sexe' => 'required|in:M,F',
+            'date_naissance' => 'nullable|date',
+            'lieu_naissance' => 'nullable|string|max:255',
+            'adresse' => 'nullable|string|max:255',
+            'nom_pere' => 'nullable|string|max:255',
+            'nom_mere' => 'nullable|string|max:255',
+            'tuteur_id' => 'required|exists:tuteurs,id',
+            'classe_id' => 'nullable|exists:classes,id',
+            'statut' => 'required|in:actif,absent,abandon'
         ]);
 
-        $eleve->update([
-            'tuteur_id'      => $request->tuteur_id,
-            'classe_id'      => $request->classe_id,
-            'nom'            => $request->nom,
-            'prenom'         => $request->prenom,
-            'date_naissance' => $request->date_naissance,
-            'lieu_naissance' => $request->lieu_naissance,
-            'adresse'        => $request->adresse,
-            'nom_pere'            => $request->nom_pere,
-            'nom_mere'            => $request->nom_mere,
-            'sexe'   => $request->eleve_sexe,
-            'statut' => $request->eleve_statut,
+        $eleve->update($request->all());
 
-        ]);
-
-        return redirect()->route('eleve.index')
-            ->with('success', 'Élève mis à jour avec succès.');
+        return redirect()->route('eleve.index')->with('success', 'Élève mis à jour avec succès.');
     }
 
     /**
-     * Supprimer un élève
+     * Supprime un élève
      */
-    public function destroy($id)
+    public function delete($id)
     {
         $eleve = Eleve::findOrFail($id);
+        $tuteur = $eleve->tuteur;
+
         $eleve->delete();
 
-        return redirect()->route('eleve.index')
-            ->with('success', 'Élève supprimé avec succès.');
+        // Vérifie si le tuteur n’a plus d’élèves, puis supprime-le
+        if ($tuteur && $tuteur->eleves()->count() == 0) {
+            $tuteur->delete();
+        }
+
+        return redirect()->route('eleve.index')->with('success', 'Élève et tuteur supprimés ils sont liés.');
     }
 }

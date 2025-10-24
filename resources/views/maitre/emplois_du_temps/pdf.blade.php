@@ -54,7 +54,7 @@
                 <td>{{ \Carbon\Carbon::parse($emploi->heure_fin)->format('H:i') }}</td>
                 <td>{{ $emploi->classe->nom }}</td>
                 <td>{{ $emploi->matiere->nom }}</td>
-                <td>{{ $emploi->anneeScolaire->annee ?? '' }}</td>
+                <td>{{ $emploi->anneeScolaire->libelle ?? '' }}</td>
             </tr>
             @endforeach
         </tbody>

@@ -8,7 +8,7 @@
 
     <div class="mb-3 d-flex justify-content-end">
         <a href="{{ route('tuteur.frais_scolaire.index') }}" class="btn btn-secondary me-2">← Retour</a>
-        <a href="#" class="btn btn-success">Télécharger PDF</a>
+        <!-- <a href="#" class="btn btn-success">Télécharger PDF</a> -->
     </div>
 
     @if($paiements->count())

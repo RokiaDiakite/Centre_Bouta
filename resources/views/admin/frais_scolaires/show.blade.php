@@ -129,12 +129,15 @@
 
 {{-- Script AJAX pour recharger les élèves selon la classe --}}
 <script>
-    document.getElementById('classe_id').addEventListener('change', function() {
-        const classeId = this.value;
+    function loadEleves() {
+        const classeId = document.getElementById('classe_id').value;
+        const anneeId = document.getElementById('annee_scolaire_id').value;
         const eleveSelect = document.getElementById('eleve_id');
+
         eleveSelect.innerHTML = '<option value="">Chargement...</option>';
-        if (classeId) {
-            fetch(`{{ route('frais.eleve') }}?classe_id=${classeId}`)
+
+        if (classeId && anneeId) {
+            fetch(`{{ route('frais.eleve') }}?classe_id=${classeId}&annee_scolaire_id=${anneeId}`)
                 .then(res => res.json())
                 .then(data => {
                     eleveSelect.innerHTML = '<option value="">-- Choisir un élève --</option>';
@@ -146,6 +149,9 @@
         } else {
             eleveSelect.innerHTML = '<option value="">-- Choisir un élève --</option>';
         }
-    });
+    }
+
+    document.getElementById('classe_id').addEventListener('change', loadEleves);
+    document.getElementById('annee_scolaire_id').addEventListener('change', loadEleves);
 </script>
 @endsection

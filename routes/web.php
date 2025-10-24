@@ -188,7 +188,7 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::get('eleves/{id}/edit', 'edit')->name('eleve.edit');
         Route::post('eleves/update/{id}', 'update')->name('eleve.update');
 
-        Route::post('eleves/delete/{id}', 'destroy')->name('eleve.delete');
+        Route::post('eleves/delete/{id}', 'delete')->name('eleve.delete');
     });
 
     //  Évaluations
@@ -319,7 +319,7 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::post('inscriptions/store', 'store')->name('inscription.store');
         Route::get('inscriptions/{id}/edit', 'edit')->name('inscription.edit');
         Route::post('inscriptions/update/{id}', 'update')->name('inscription.update');
-        Route::post('inscriptions/delete/{id}', 'destroy')->name('inscription.delete');
+        Route::post('inscriptions/delete/{id}', 'delete')->name('inscription.delete');
     });
 
     // Bulletins
