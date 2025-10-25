@@ -12,7 +12,7 @@
         <li class="menu-item {{ request()->routeIs('tuteur.dashboard') ? 'active' : '' }}">
             <a href="{{ route('tuteur.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div>Dashboard</div>
+                <div data-i18n="Analytics">Dashboard</div>
             </a>
         </li>
 
@@ -20,7 +20,7 @@
         <li class="menu-item {{ request()->routeIs('emploi.*') ? 'active open' : '' }}">
             <a href="{{ route('tuteur.emplois.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-time-five"></i>
-                <div>Emploi du Temps</div>
+                <div data-i18n="Analytics">Emploi du Temps</div>
             </a>
         </li>
 
@@ -28,7 +28,7 @@
         <li class="menu-item {{ request()->routeIs('tuteur.bulletin.*') ? 'active open' : '' }}">
             <a href="{{ route('tuteur.bulletin.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-book"></i>
-                <div>Bulletins</div>
+                <div data-i18n="Analytics">Bulletins</div>
             </a>
         </li>
 
@@ -36,7 +36,7 @@
         <li class="menu-item {{ request()->routeIs('tuteur.frais_scolaire.*') ? 'active open' : '' }}">
             <a href="{{ route('tuteur.frais_scolaire.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-money"></i>
-                <div>Frais scolaire</div>
+                <div data-i18n="Analytics">Frais scolaire</div>
             </a>
         </li>
     </ul>

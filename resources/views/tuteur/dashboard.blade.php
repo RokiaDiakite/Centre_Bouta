@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="mb-4">Bienvenue, {{ Auth::user()->nom }}</h4>
+    <h2 class="mb-4">Bienvenue, Madame {{ Auth::user()->prenom }} {{ Auth::user()->nom }}</h2>
 
     <div class="row g-3">
         <!-- Mes élèves -->
@@ -12,7 +12,7 @@
             <div class="card text-white bg-primary h-100">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
-                        <h5 class="card-title">Mes élèves</h5>
+                        <h5 class="card-title">Mes enfants</h5>
                         <p class="display-6 mb-0">{{ $eleves_count }}</p>
                     </div>
                     <i class="fas fa-user-graduate fa-3x"></i>
@@ -71,7 +71,7 @@
             <div class="card border-warning h-100">
                 <div class="card-body">
                     <h5 class="card-title">Statistiques des paiements</h5>
-                    <p class="card-text">Consultez le résumé global des paiements.</p>
+                    <p class="card-text">Consultez le résumé global des paiements de vos enfants.</p>
                     <a href="{{ route('tuteur.frais_scolaire.index') }}" class="btn btn-warning btn-sm">Voir</a>
                 </div>
             </div>

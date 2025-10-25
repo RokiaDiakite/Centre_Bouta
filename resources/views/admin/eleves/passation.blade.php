@@ -11,7 +11,7 @@
             <select name="annee" id="annee" class="form-select">
                 <option value="">-- Sélectionnez une année --</option>
                 @foreach($annees as $annee)
-                    <option value="{{ $annee->id }}">{{ $annee->libelle }}</option>
+                <option value="{{ $annee->id }}">{{ $annee->libelle }}</option>
                 @endforeach
             </select>
         </div>
@@ -21,7 +21,7 @@
             <select name="classe" id="classe" class="form-select">
                 <option value="">-- Sélectionnez une classe --</option>
                 @foreach($classes as $classe)
-                    <option value="{{ $classe->id }}">{{ $classe->nom }}</option>
+                <option value="{{ $classe->id }}">{{ $classe->nom }}</option>
                 @endforeach
             </select>
         </div>
@@ -44,9 +44,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {{-- Les élèves filtrés seront insérés ici en AJAX --}}
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -54,29 +52,29 @@
 
 {{-- ⚙️ Script --}}
 <script>
-document.getElementById('btnFiltrer').addEventListener('click', function () {
-    const annee = document.getElementById('annee').value;
-    const classe = document.getElementById('classe').value;
+    document.getElementById('btnFiltrer').addEventListener('click', function() {
+        const annee = document.getElementById('annee').value;
+        const classe = document.getElementById('classe').value;
 
-    if (!annee || !classe) {
-        alert("Veuillez sélectionner l'année scolaire et la classe.");
-        return;
-    }
+        if (!annee || !classe) {
+            alert("Veuillez sélectionner l'année scolaire et la classe.");
+            return;
+        }
 
-    fetch(`/admin/passation?annee=${annee}&classe=${classe}`)
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.querySelector('#tableEleves tbody');
-            tbody.innerHTML = '';
+        fetch(`/admin/passation/eleves?annee=${annee}&classe=${classe}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#tableEleves tbody');
+                tbody.innerHTML = '';
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Aucun élève trouvé</td></tr>';
-                return;
-            }
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Aucun élève trouvé</td></tr>';
+                    return;
+                }
 
-            data.forEach((eleve, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                data.forEach((eleve, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${eleve.nom} ${eleve.prenom}</td>
                     <td>${eleve.matricule}</td>
@@ -87,27 +85,30 @@ document.getElementById('btnFiltrer').addEventListener('click', function () {
                         </button>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('❌ Erreur lors du chargement. Vérifie ta console (F12).');
             });
-        })
-        .catch(error => console.error('Erreur:', error));
-});
+    });
 
-function fairePasser(idEleve) {
-    if (!confirm("Voulez-vous vraiment faire passer cet élève ?")) return;
+    function fairePasser(idEleve) {
+        if (!confirm("Voulez-vous vraiment faire passer cet élève ?")) return;
 
-    fetch(`/admin/passation/faire-passer/${idEleve}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        document.getElementById('btnFiltrer').click(); // rafraîchir la liste
-    })
-    .catch(error => console.error('Erreur:', error));
-}
+        fetch(`/admin/passation/faire-passer/${idEleve}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('btnFiltrer').click(); // rafraîchir la liste
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
 </script>
 @endsection

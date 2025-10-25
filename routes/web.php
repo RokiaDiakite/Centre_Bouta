@@ -195,10 +195,11 @@ Route::prefix('admin')->middleware(['auth:web'])->group(function () {
         Route::post('eleves/update/{id}', 'update')->name('eleve.update');
 
         Route::post('eleves/delete/{id}', 'delete')->name('eleve.delete');
-        Route::get('eleves/passation','passation')->name('passation');
-        Route::get('passation/eleves', 'getEleves');
-        Route::post('passation/faire-passer/{id}', 'fairePasser');
 
+
+        Route::get('eleves/passation', [EleveController::class, 'passation'])->name('passation');
+        Route::get('passation/eleves', [EleveController::class, 'getEleves']);
+        Route::post('passation/faire-passer/{id}', [EleveController::class, 'fairePasser']);
     });
 
     //  Évaluations

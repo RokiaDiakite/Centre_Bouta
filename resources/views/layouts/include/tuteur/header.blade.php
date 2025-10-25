@@ -15,8 +15,8 @@
                 <input
                     type="text"
                     class="form-control border-0 shadow-none"
-                    placeholder="Search..."
-                    aria-label="Search..." />
+                    placeholder="Rechercher..."
+                    aria-label="Rechercher..." />
             </div>
         </div>
         <!-- /Search -->

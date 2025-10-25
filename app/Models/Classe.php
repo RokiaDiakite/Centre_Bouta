@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Classe extends Model
 {
-    protected $fillable = ['nom', 'niveau', 'frais'];
+    protected $fillable = ['nom', 'niveau', 'frais', 'niveau_ordre'];
 
     public function eleves()
     {

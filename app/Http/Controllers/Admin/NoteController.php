@@ -161,4 +161,28 @@ class NoteController extends Controller
 
         return view('admin.notes.edit', compact('note', 'annees', 'classes', 'matieres', 'evaluations'));
     }
+    public function store(Request $request)
+    {
+        $request->validate([
+            'annee_id' => 'required|exists:annee_scolaires,id',
+            'classe_id' => 'required|exists:classes,id',
+            'matiere_id' => 'required|exists:matieres,id',
+            'evaluation_id' => 'required|exists:evaluations,id',
+            'eleve_id' => 'required|exists:eleves,id',
+            'note_devoir' => 'nullable|numeric|min:0|max:20',
+            'note_evaluation' => 'nullable|numeric|min:0|max:20',
+        ]);
+
+        Note::create([
+            'eleve_id' => $request->eleve_id,
+            'annee_scolaire_id' => $request->annee_id,
+            'classe_id' => $request->classe_id,
+            'matiere_id' => $request->matiere_id,
+            'evaluation_id' => $request->evaluation_id,
+            'note_devoir' => $request->note_devoir,
+            'note_evaluation' => $request->note_evaluation,
+        ]);
+
+        return redirect()->route('note.index')->with('success', 'Note ajoutée avec succès.');
+    }
 }
